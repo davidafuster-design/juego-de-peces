@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>El Pescador - El Rescate de los Peces</title>
+  <!-- Tailwind CSS para diseño responsivo y utilidades -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Nunito & Fredoka para estética amigable y educativa -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-display: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 50%, #e0f7fa 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: var(--font-display);
+    }
+
+    /* Animaciones ambientales SVG */
+    @keyframes floatCloudSlow {
+      0% { transform: translateX(-20px); }
+      50% { transform: translateX(25px); }
+      100% { transform: translateX(-20px); }
+    }
+
+    @keyframes floatCloudFast {
+      0% { transform: translateX(15px); }
+      50% { transform: translateX(-30px); }
+      100% { transform: translateX(15px); }
+    }
+
+    @keyframes swayReeds {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    @keyframes waterShimmer {
+      0%, 100% { transform: translateX(0px) scaleX(1); opacity: 0.6; }
+      50% { transform: translateX(12px) scaleX(1.06); opacity: 0.9; }
+    }
+
+    @keyframes bobFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-3px) rotate(-2deg); }
+    }
+
+    @keyframes fisherBreathe {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-2px); }
+    }
+
+    @keyframes basketShake {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      20% { transform: rotate(-6deg) scale(1.04); }
+      40% { transform: rotate(6deg) scale(1.04); }
+      60% { transform: rotate(-4deg) scale(1.02); }
+      80% { transform: rotate(4deg) scale(1.02); }
+    }
+
+    @keyframes fishIdleBasket {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-3px) rotate(5deg); }
+    }
+
+    @keyframes letterPop {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .cloud-1 { animation: floatCloudSlow 18s ease-in-out infinite; }
+    .cloud-2 { animation: floatCloudFast 24s ease-in-out infinite; }
+    .reed-sway { transform-origin: bottom center; animation: swayReeds 4.5s ease-in-out infinite; }
+    .water-line { animation: waterShimmer 5s ease-in-out infinite; }
+    .bobber-anim { transform-origin: center; animation: bobFloat 2.4s ease-in-out infinite; }
+    .fisher-body { animation: fisherBreathe 3.5s ease-in-out infinite; }
+    .basket-shake { transform-origin: 278px 232px; animation: basketShake 0.55s ease-in-out; }
+    .fish-basket-idle { animation: fishIdleBasket 2s ease-in-out infinite; }
+    .letter-revealed { animation: letterPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+    /* Botones táctiles 3D amigables */
+    .key-btn {
+      transition: all 0.12s ease;
+      box-shadow: 0 3px 0 #cbd5e1;
+    }
+    .key-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 0 #94a3b8;
+    }
+    .key-btn:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #94a3b8;
+    }
+    .key-btn:disabled {
+      cursor: not-allowed;
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+    .key-correct {
+      background-color: #10b981 !important;
+      color: #ffffff !important;
+      border-color: #059669 !important;
+    }
+    .key-wrong {
+      background-color: #f1f5f9 !important;
+      color: #94a3b8 !important;
+      border-color: #e2e8f0 !important;
+      opacity: 0.65;
+    }
+
+    /* Glassmorphism suave para tarjetas */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+    }
+
+    /* Scrollbar limpio */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #93c5fd;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="text-slate-800 flex flex-col justify-between p-2 sm:p-4">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="max-w-5xl w-full mx-auto flex flex-col gap-3 sm:gap-4">
+
+    <!-- CABECERA / BARRA SUPERIOR -->
+    <header class="glass-card rounded-2xl px-3 py-2.5 sm:px-5 sm:py-3 shadow-md flex flex-wrap items-center justify-between gap-2">
+      <!-- Logo & Título -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 flex items-center justify-center text-white shadow-sm shrink-0">
+          <!-- Icono SVG Pez -->
+          <svg class="w-6 h-6 sm:w-7 sm:h-7" viewBox="0 0 32 32" fill="none">
+            <path d="M24 16C24 16 19 9 11 9C6 9 3 13 3 16C3 19 6 23 11 23C19 23 24 16 24 16Z" fill="#FDE047" stroke="#CA8A04" stroke-width="2"/>
+            <path d="M23 16L29 10V22L23 16Z" fill="#FB923C" stroke="#C2410C" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="9" cy="14.5" r="1.8" fill="#1E293B"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-2xl font-bold text-sky-900 leading-tight tracking-tight">El Pescador</h1>
+          <p class="text-xs text-sky-700 font-semibold hidden sm:block">El Rescate de los Peces · Juego de Palabras</p>
+        </div>
+      </div>
+
+      <!-- Controles superiores: Categoría, Racha y Audio -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+        <!-- Selector de Categoría -->
+        <div class="relative">
+          <label for="category-select" class="sr-only">Categoría</label>
+          <select id="category-select" class="bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-xs sm:text-sm rounded-xl px-3 py-2 border-2 border-sky-200 focus:outline-none focus:border-sky-500 transition cursor-pointer">
+            <option value="todas">🌎 Todas las Categorías</option>
+            <option value="patagonia">🏔️ Flora y Fauna Patagónica</option>
+            <option value="aves">🦅 Aves y Naturaleza</option>
+            <option value="cultura">🎭 Cultura General</option>
+            <option value="ciencia">🔬 Ciencia y Arte</option>
+          </select>
+        </div>
+
+        <!-- Contador de Racha -->
+        <div class="flex items-center gap-1.5 bg-amber-50 border-2 border-amber-200 px-3 py-1.5 rounded-xl" title="Racha de palabras adivinadas seguidas">
+          <span class="text-base sm:text-lg">🔥</span>
+          <div class="leading-none">
+            <span class="text-[10px] uppercase font-extrabold text-amber-700 block">Racha</span>
+            <span id="streak-count" class="text-sm sm:text-base font-extrabold text-amber-900">0</span>
+          </div>
+        </div>
+
+        <!-- Botón de Audio -->
+        <button id="audio-toggle" type="button" class="p-2 sm:p-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 border-2 border-teal-200 text-teal-800 transition active:scale-95" title="Activar o silenciar sonidos" aria-label="Control de audio">
+          <!-- Icono sonido activo -->
+          <svg id="icon-sound-on" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14" />
+          </svg>
+          <!-- Icono sonido muteado -->
+          <svg id="icon-sound-off" class="w-5 h-5 hidden text-rose-600" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM23 9l-6 6M17 9l6 6" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ESCENARIO VISUAL SVG (RÍO PATAGÓNICO, PESCADOR Y CESTA DE 5 PECES) -->
+    <section class="relative rounded-3xl overflow-hidden shadow-lg border-4 border-white bg-sky-200">
+      
+      <!-- HUD Flotante sobre el escenario: Contador de peces y botón de Pista -->
+      <div class="absolute top-3 left-3 right-3 z-10 flex items-center justify-between gap-2 pointer-events-none">
+        <!-- Indicador de Peces en la Cesta -->
+        <div class="pointer-events-auto bg-white/90 backdrop-blur-md px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl shadow-sm border border-sky-100 flex items-center gap-2">
+          <span class="text-xs sm:text-sm font-extrabold text-sky-950">Cesta:</span>
+          <div id="fish-hearts" class="flex items-center gap-1" aria-label="Peces restantes en la cesta">
+            <!-- Se llena dinámicamente con iconos de peces -->
+          </div>
+          <span id="fish-counter-text" class="text-xs sm:text-sm font-black text-sky-700 ml-1 bg-sky-100 px-2 py-0.5 rounded-lg">5/5</span>
+        </div>
+
+        <!-- Botón de Pista y Nueva Palabra -->
+        <div class="pointer-events-auto flex items-center gap-2">
+          <button id="hint-btn" type="button" class="bg-amber-400 hover:bg-amber-500 active:scale-95 text-amber-950 font-extrabold text-xs sm:text-sm px-3 py-2 sm:px-4 sm:py-2 rounded-2xl shadow-md border-b-4 border-amber-600 flex items-center gap-1.5 transition">
+            <span>💡</span>
+            <span>Pista</span>
+          </button>
+          <button id="skip-btn" type="button" class="bg-white/90 hover:bg-white active:scale-95 text-slate-700 font-bold text-xs sm:text-sm p-2 sm:px-3 sm:py-2 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-1 transition" title="Cambiar de palabra">
+            <span>🔄</span>
+            <span class="hidden sm:inline">Otra</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Banner de Pista Desplegable -->
+      <div id="hint-banner" class="hidden absolute bottom-3 left-3 right-3 z-10 bg-amber-50/95 backdrop-blur-md border-2 border-amber-300 rounded-2xl px-4 py-2.5 shadow-md flex items-center justify-between gap-3 transition-all">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl shrink-0">🧭</span>
+          <p class="text-xs sm:text-sm font-bold text-amber-950">
+            <span class="uppercase text-[11px] tracking-wider text-amber-700 block">Pista de la palabra:</span>
+            <span id="hint-text">Cargando pista...</span>
+          </p>
+        </div>
+        <button id="close-hint-btn" type="button" class="text-amber-700 hover:text-amber-950 font-bold text-lg px-2" aria-label="Cerrar pista">&times;</button>
+      </div>
+
+      <!-- ILUSTRACIÓN VECTORIAL SVG PATAGÓNICA -->
+      <svg id="patagonia-scene" viewBox="0 0 800 320" class="w-full h-[210px] sm:h-[270px] md:h-[300px] block object-cover" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <!-- Gradiente Cielo -->
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#38bdf8"/>
+            <stop offset="55%" stop-color="#bae6fd"/>
+            <stop offset="100%" stop-color="#fef9c3"/>
+          </linearGradient>
+          <!-- Gradiente Montañas Cordillera -->
+          <linearGradient id="mountainGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#475569"/>
+            <stop offset="65%" stop-color="#64748b"/>
+            <stop offset="100%" stop-color="#94a3b8"/>
+          </linearGradient>
+          <!-- Gradiente Colinas Boscosas -->
+          <linearGradient id="hillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#15803d"/>
+            <stop offset="100%" stop-color="#166534"/>
+          </linearGradient>
+          <!-- Gradiente Río / Laguna -->
+          <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0284c7"/>
+            <stop offset="45%" stop-color="#0ea5e9"/>
+            <stop offset="100%" stop-color="#0369a1"/>
+          </linearGradient>
+          <!-- Gradiente Madera Muelle -->
+          <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#b45309"/>
+            <stop offset="100%" stop-color="#78350f"/>
+          </linearGradient>
+          <!-- ClipPath para interior de la cesta -->
+          <clipPath id="basketInteriorClip">
+            <ellipse cx="278" cy="212" rx="22" ry="12" />
+          </clipPath>
+        </defs>
+
+        <!-- 1. CIELO Y SOL -->
+        <rect width="800" height="320" fill="url(#skyGrad)" />
+        <circle cx="670" cy="68" r="34" fill="#fef08a" opacity="0.85" />
+        <circle cx="670" cy="68" r="24" fill="#fde047" />
+
+        <!-- Nubes animadas -->
+        <g class="cloud-1" fill="#ffffff" opacity="0.88">
+          <circle cx="140" cy="62" r="18"/>
+          <circle cx="162" cy="56" r="24"/>
+          <circle cx="188" cy="62" r="18"/>
+          <rect x="140" y="62" width="48" height="18" rx="9"/>
+        </g>
+        <g class="cloud-2" fill="#ffffff" opacity="0.78">
+          <circle cx="460" cy="48" r="15"/>
+          <circle cx="480" cy="42" r="20"/>
+          <circle cx="502" cy="49" r="15"/>
+          <rect x="460" y="48" width="42" height="16" rx="8"/>
+        </g>
+
+        <!-- 2. MONTAÑAS DE LOS ANDES PATAGÓNICOS -->
+        <g>
+          <!-- Picos principales -->
+          <polygon points="180,210 310,72 440,210" fill="url(#mountainGrad)" />
+          <polygon points="340,210 490,62 650,210" fill="#475569" />
+          <polygon points="520,210 680,88 830,210" fill="url(#mountainGrad)" />
+          <!-- Nieve en las cumbres -->
+          <polygon points="310,72 276,108 295,103 310,115 326,101 344,108" fill="#f8fafc" />
+          <polygon points="490,62 451,101 472,96 490,112 511,96 530,102" fill="#ffffff" />
+          <polygon points="680,88 646,120 666,115 680,126 697,114 714,120" fill="#f1f5f9" />
+        </g>
+
+        <!-- 3. BOSQUE DE CIPRESES Y LENGAS AL FONDO -->
+        <path d="M0,210 Q180,165 390,195 T800,185 L800,220 L0,220 Z" fill="url(#hillGrad)" />
+        <!-- Siluetas de pinos/cipreses patagónicos -->
+        <g fill="#14532d">
+          <polygon points="350,192 360,155 370,192" />
+          <polygon points="375,194 387,148 399,194" />
+          <polygon points="405,193 414,160 423,193" />
+          <polygon points="560,190 572,145 584,190" />
+          <polygon points="590,190 600,156 610,190" />
+          <polygon points="730,188 744,142 758,188" />
+        </g>
+
+        <!-- 4. AGUA DEL RÍO / LAGUNA -->
+        <rect x="0" y="208" width="800" height="112" fill="url(#waterGrad)" />
+        <!-- Reflejos de luz en el agua -->
+        <g stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
+          <line x1="390" y1="226" x2="465" y2="226" class="water-line" />
+          <line x1="540" y1="238" x2="640" y2="238" class="water-line" style="animation-delay: 1.2s;" />
+          <line x1="420" y1="262" x2="525" y2="262" class="water-line" style="animation-delay: 2.3s;" />
+          <line x1="610" y1="284" x2="730" y2="284" class="water-line" style="animation-delay: 0.7s;" />
+          <line x1="340" y1="295" x2="430" y2="295" class="water-line" style="animation-delay: 1.8s;" />
+        </g>
+
+        <!-- Capa para ondas de chapoteo cuando un pez cae al agua -->
+        <g id="splashes-layer"></g>
+
+        <!-- Capa para los peces que ya escaparon y nadan libres en el río -->
+        <g id="swimming-fish-layer"></g>
+
+        <!-- 5. ORILLA VERDE Y MUELLE DE MADERA -->
+        <!-- Pilotes del muelle sumergidos -->
+        <rect x="135" y="232" width="12" height="65" rx="3" fill="#451a03" />
+        <rect x="235" y="232" width="12" height="72" rx="3" fill="#451a03" />
+        <rect x="315" y="232" width="12" height="68" rx="3" fill="#451a03" />
+
+        <!-- Tablones del muelle -->
+        <rect x="60" y="224" width="280" height="14" rx="5" fill="url(#woodGrad)" stroke="#451a03" stroke-width="1.5" />
+        <!-- Detalles de tablas -->
+        <line x1="120" y1="224" x2="120" y2="238" stroke="#451a03" stroke-width="1.5" />
+        <line x1="175" y1="224" x2="175" y2="238" stroke="#451a03" stroke-width="1.5" />
+        <line x1="230" y1="224" x2="230" y2="238" stroke="#451a03" stroke-width="1.5" />
+        <line x1="285" y1="224" x2="285" y2="238" stroke="#451a03" stroke-width="1.5" />
+
+        <!-- Orilla izquierda con pasto y juncos -->
+        <path d="M0,192 Q75,188 125,228 L125,320 L0,320 Z" fill="#16a34a" />
+        <path d="M0,212 Q60,210 105,245 L105,320 L0,320 Z" fill="#15803d" />
+        <!-- Piedras en la orilla -->
+        <ellipse cx="95" cy="265" rx="22" ry="12" fill="#64748b" />
+        <ellipse cx="118" cy="276" rx="15" ry="9" fill="#94a3b8" />
+        <!-- Juncos patagónicos -->
+        <g class="reed-sway">
+          <path d="M28,245 Q22,200 15,172" stroke="#15803d" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="15" cy="172" rx="3.5" ry="10" fill="#713f12" transform="rotate(-12 15 172)"/>
+          <path d="M40,248 Q42,205 48,178" stroke="#166534" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="48" cy="178" rx="3.5" ry="10" fill="#713f12" transform="rotate(10 48 178)"/>
+          <path d="M52,250 Q58,215 66,192" stroke="#22c55e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- 6. EL PESCADOR SENTADO EN EL MUELLE -->
+        <g id="fisherman" class="fisher-body">
+          <!-- Piernas colgando del muelle -->
+          <path d="M188,212 L205,248 L216,248" stroke="#1e3a8a" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M198,212 L216,245 L227,245" stroke="#1d4ed8" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Botas -->
+          <rect x="209" y="243" width="14" height="7" rx="3.5" fill="#78350f"/>
+          <rect x="220" y="240" width="14" height="7" rx="3.5" fill="#92400e"/>
+
+          <!-- Torso (Camisa escocesa / chaleco de pesca) -->
+          <rect x="164" y="166" width="34" height="48" rx="14" fill="#dc2626" />
+          <rect x="172" y="166" width="22" height="46" rx="8" fill="#d97706" />
+
+          <!-- Cabeza y rostro -->
+          <circle cx="182" cy="146" r="16" fill="#fed7aa" />
+          <!-- Mejilla y sonrisa / expresión -->
+          <circle cx="190" cy="149" r="3" fill="#fb7185" opacity="0.5"/>
+          <circle cx="188" cy="143" r="2" fill="#1e293b" />
+          <path id="fisher-mouth" d="M185,153 Q190,157 194,152" stroke="#7c2d12" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+          <!-- Sombrero de pescador -->
+          <ellipse cx="182" cy="134" rx="25" ry="5.5" fill="#ca8a04" />
+          <path d="M167,134 Q169,116 182,116 Q195,116 197,134 Z" fill="#eab308" />
+          <rect x="167" y="130" width="30" height="3.5" fill="#78350f" />
+
+          <!-- Brazo y Caña de Pescar -->
+          <path d="M178,176 L204,186 L216,178" stroke="#dc2626" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="217" cy="177" r="4.5" fill="#fed7aa" />
+
+          <!-- Caña arqueada hacia el río -->
+          <path d="M212,182 Q290,125 385,118" stroke="#78350f" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <!-- Carrete -->
+          <circle cx="226" cy="172" r="5" fill="#94a3b8" stroke="#334155" stroke-width="1.5"/>
+          <!-- TanZa / Sedal y Boya en el agua -->
+          <line x1="385" y1="118" x2="385" y2="232" stroke="#f8fafc" stroke-width="1" stroke-dasharray="3 2" opacity="0.8"/>
+          <g class="bobber-anim">
+            <circle cx="385" cy="233" r="5" fill="#ef4444" />
+            <path d="M380,233 A5,5 0 0,0 390,233 Z" fill="#ffffff" />
+          </g>
+        </g>
+
+        <!-- 7. CESTA DE MIMBRE CON LOS 5 PECES -->
+        <g id="basket-group">
+          <!-- Sombra de la cesta en el muelle -->
+          <ellipse cx="278" cy="225" rx="26" ry="4" fill="#451a03" opacity="0.45"/>
+
+          <!-- Interior oscuro de la cesta -->
+          <ellipse cx="278" cy="202" rx="23" ry="8" fill="#451a03" />
+
+          <!-- LOS 5 PECES ASOMANDO EN LA CESTA (IDs fish-in-0 a fish-in-4) -->
+          <g id="basket-fish-container">
+            <!-- Pez 0 (Dorado) -->
+            <g id="fish-in-0" class="fish-basket-idle" style="animation-delay: 0s;">
+              <path d="M263,205 Q261,188 267,185 Q273,188 271,205 Z" fill="#facc15" stroke="#a16207" stroke-width="1.2"/>
+              <circle cx="266" cy="191" r="1.4" fill="#1e293b"/>
+            </g>
+            <!-- Pez 1 (Salmón / Naranja) -->
+            <g id="fish-in-1" class="fish-basket-idle" style="animation-delay: 0.3s;">
+              <path d="M271,205 Q270,185 276,182 Q282,185 280,205 Z" fill="#fb923c" stroke="#9a3412" stroke-width="1.2"/>
+              <circle cx="275" cy="188" r="1.4" fill="#1e293b"/>
+            </g>
+            <!-- Pez 2 (Trucha Arcoíris / Turquesa) -->
+            <g id="fish-in-2" class="fish-basket-idle" style="animation-delay: 0.6s;">
+              <path d="M279,205 Q279,186 285,183 Q291,186 288,205 Z" fill="#2dd4bf" stroke="#115e59" stroke-width="1.2"/>
+              <circle cx="284" cy="189" r="1.4" fill="#1e293b"/>
+            </g>
+            <!-- Pez 3 (Coral / Rosado) -->
+            <g id="fish-in-3" class="fish-basket-idle" style="animation-delay: 0.9s;">
+              <path d="M286,205 Q287,189 292,187 Q297,189 294,205 Z" fill="#f472b6" stroke="#9d174d" stroke-width="1.2"/>
+              <circle cx="291" cy="192" r="1.4" fill="#1e293b"/>
+            </g>
+            <!-- Pez 4 (Azul Patagónico) -->
+            <g id="fish-in-4" class="fish-basket-idle" style="animation-delay: 1.2s;">
+              <path d="M267,206 Q268,191 273,189 Q278,191 276,206 Z" fill="#60a5fa" stroke="#1e40af" stroke-width="1.2"/>
+              <circle cx="272" cy="194" r="1.4" fill="#1e293b"/>
+            </g>
+          </g>
+
+          <!-- Cuerpo exterior de la cesta de mimbre (tapa la mitad inferior de los peces) -->
+          <path d="M254,202 L260,224 Q278,228 296,224 L302,202 Z" fill="#d97706" stroke="#78350f" stroke-width="1.8" stroke-linejoin="round"/>
+          <!-- Trenzado de mimbre -->
+          <path d="M256,209 Q278,213 300,209" stroke="#92400e" stroke-width="1.5" fill="none"/>
+          <path d="M258,216 Q278,220 298,216" stroke="#92400e" stroke-width="1.5" fill="none"/>
+          <line x1="268" y1="203" x2="270" y2="225" stroke="#92400e" stroke-width="1.3"/>
+          <line x1="278" y1="203" x2="278" y2="226" stroke="#92400e" stroke-width="1.3"/>
+          <line x1="288" y1="203" x2="286" y2="225" stroke="#92400e" stroke-width="1.3"/>
+          <!-- Borde superior grueso de la cesta -->
+          <rect x="252" y="199" width="52" height="5" rx="2.5" fill="#b45309" stroke="#78350f" stroke-width="1.4"/>
+        </g>
+
+        <!-- Capa frontal para peces saltando en arco parabólico -->
+        <g id="jumping-fish-layer"></g>
+      </svg>
+    </section>
+
+    <!-- ZONA DE PALABRA SECRETA Y ESTADO -->
+    <section class="glass-card rounded-3xl p-4 sm:p-5 shadow-md flex flex-col items-center justify-center gap-3">
+      <!-- Etiqueta de categoría actual y mensaje dinámico -->
+      <div class="flex flex-wrap items-center justify-center gap-2 text-center">
+        <span id="current-category-badge" class="bg-sky-100 text-sky-800 text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full border border-sky-200">
+          Flora y Fauna Patagónica
+        </span>
+        <span id="status-message" class="text-xs sm:text-sm font-bold text-slate-600">
+          ¡Adivina la palabra antes de que escapen los 5 peces!
+        </span>
+      </div>
+
+      <!-- Contenedor de casillas de la palabra secreta -->
+      <div id="word-container" class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 my-1 min-h-[52px] sm:min-h-[62px]" aria-label="Palabra secreta">
+        <!-- Las letras y espacios se generan dinámicamente aquí -->
+      </div>
+    </section>
+
+    <!-- TECLADO VIRTUAL ESPAÑOL (A-Z + Ñ) -->
+    <section class="glass-card rounded-3xl p-3 sm:p-4 shadow-md">
+      <div id="keyboard-container" class="flex flex-col gap-1.5 sm:gap-2 max-w-3xl mx-auto" role="group" aria-label="Teclado virtual">
+        <!-- Las filas del teclado QWERTY español se generan dinámicamente -->
+      </div>
+      <p class="text-center text-[11px] text-slate-500 font-semibold mt-2.5 hidden sm:block">
+        💡 Consejo: También puedes escribir directamente con tu teclado físico.
+      </p>
+    </section>
+
+  </div>
+
+  <!-- MODAL DE FIN DE PARTIDA (VICTORIA O PECES LIBERADOS) -->
+  <div id="endgame-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+    <div id="endgame-card" class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-4 border-sky-200 text-center transform scale-95 transition-transform">
+      <!-- Icono animado superior -->
+      <div id="modal-emoji" class="w-20 h-20 mx-auto mb-3 rounded-full bg-sky-100 flex items-center justify-center text-4xl sm:text-5xl shadow-inner">
+        🏆
+      </div>
+
+      <h2 id="modal-title" class="text-2xl sm:text-3xl font-extrabold text-sky-950 mb-1">
+        ¡Excelente Pesca!
+      </h2>
+
+      <p id="modal-subtitle" class="text-sm sm:text-base text-slate-600 font-semibold mb-4">
+        Lograste adivinar la palabra y mantener los peces en la cesta.
+      </p>
+
+      <!-- Tarjeta con la palabra revelada y su dato educativo -->
+      <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-3.5 mb-5">
+        <span class="text-[11px] uppercase tracking-wider font-extrabold text-sky-600 block mb-0.5">La palabra secreta era:</span>
+        <p id="modal-word" class="text-2xl sm:text-3xl font-black text-sky-900 tracking-widest mb-1.5">
+          HUEMUL
+        </p>
+        <p id="modal-fact" class="text-xs sm:text-sm text-slate-700 font-medium leading-snug">
+          Ciervo nativo de los bosques andino-patagónicos, símbolo natural del sur.
+        </p>
+      </div>
+
+      <!-- Botón Jugar de Nuevo -->
+      <button id="play-again-btn" type="button" class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-teal-500 to-sky-500 hover:from-teal-600 hover:to-sky-600 text-white font-display font-bold text-lg sm:text-xl shadow-lg border-b-4 border-sky-700 active:translate-y-0.5 transition cursor-pointer">
+        🎣 Jugar de nuevo
+      </button>
+    </div>
+  </div>
+
+  <!-- LÓGICA DEL JUEGO, BANCO DE PALABRAS, ANIMACIONES SVG Y WEB AUDIO -->
+  <script>
+    /**
+     * =========================================================================
+     * 1. BANCO DE PALABRAS EN ESPAÑOL POR CATEGORÍAS (20 palabras por categoría)
+     * =========================================================================
+     */
+    const WORD_BANK = {
+      patagonia: {
+        label: "🏔️ Flora y Fauna Patagónica",
+        words: [
+          { word: "HUEMUL", hint: "Ciervo nativo de los bosques andino-patagónicos, declarado monumento natural." },
+          { word: "GUANACO", hint: "Camélido silvestre muy veloz que habita las estepas de la Patagonia." },
+          { word: "CHOIQUE", hint: "Ave corredora sudamericana parecida al avestruz, también llamada ñandú petiso." },
+          { word: "ARAUCARIA", hint: "Árbol milenario de tronco grueso y copa en forma de paraguas llamado pehuén." },
+          { word: "CALAFATE", hint: "Arbusto espinoso con frutos morados dulces; dicen que quien los come siempre vuelve." },
+          { word: "ARRAYAN", hint: "Árbol de corteza color canela y fría al tacto que forma bosques mágicos." },
+          { word: "LENGA", hint: "Árbol típico del bosque andino cuyas hojas se tiñen de rojo intenso en otoño." },
+          { word: "COIHUE", hint: "Árbol gigante de hojas perennes que crece junto a los lagos cordilleranos." },
+          { word: "MARA", hint: "Roedor patagónico de patas largas que parece una mezcla entre liebre y ciervo." },
+          { word: "PUDU", hint: "Uno de los ciervos más pequeños del mundo, habita en los bosques húmedos del sur." },
+          { word: "PINGUINO", hint: "Ave marina que no vuela y forma grandes colonias en las costas patagónicas." },
+          { word: "BALLENA", hint: "Gigante marino que visita cada año las costas de Península Valdés." },
+          { word: "ORCA", hint: "Cetáceo blanco y negro conocido por su inteligencia y caza cooperativa en el mar." },
+          { word: "TRUCHA", hint: "Pez muy apreciado en los ríos y lagos cristalinos de la Patagonia." },
+          { word: "PEJERREY", hint: "Pez plateado y alargado muy común en lagunas y ríos argentinos." },
+          { word: "ZORRO", hint: "Mamífero astuto de cola tupida; en la Patagonia habitan el gris y el colorado." },
+          { word: "PUMA", hint: "El gran felino silvestre de América, ágil y sigiloso en la estepa y montaña." },
+          { word: "NOTRO", hint: "Arbusto o árbol patagónico famoso por sus llamativas flores rojo fuego." },
+          { word: "MUTISIA", hint: "Enredadera trepadora con hermosas flores anaranjadas típica de la cordillera." },
+          { word: "GLACIAR", hint: "Enorme masa de hielo milenario que desciende lentamente desde las montañas." }
+        ]
+      },
+      aves: {
+        label: "🦅 Aves y Naturaleza",
+        words: [
+          { word: "CONDOR", hint: "Majestuosa ave carroñera de enorme envergadura que planea sobre los Andes." },
+          { word: "FLAMENCO", hint: "Ave zancuda de plumaje rosado que se alimenta filtrando agua en lagunas." },
+          { word: "COLIBRI", hint: "Diminuta ave capaz de volar hacia atrás y batir sus alas decenas de veces por segundo." },
+          { word: "HORNERO", hint: "Ave nacional de Argentina famosa por construir su nido de barro como un horno." },
+          { word: "CARANCHO", hint: "Ave rapaz de cresta oscura muy común en campos, rutas y estepas." },
+          { word: "TERO", hint: "Ave vigilante de praderas que lanza fuertes gritos si alguien se acerca a su nido." },
+          { word: "CHINGOLO", hint: "Pequeño pajarito cantor con un simpático copete en la cabeza." },
+          { word: "LECHUZA", hint: "Ave nocturna de visión aguda y vuelo completamente silencioso." },
+          { word: "GAVIOTA", hint: "Ave costera blanca y gris que suele seguir a los barcos pesqueros." },
+          { word: "ALBATROS", hint: "Ave marina con una de las mayores envergaduras de alas del planeta." },
+          { word: "CASCADA", hint: "Caída natural de agua desde cierta altura en el curso de un río." },
+          { word: "ARROYO", hint: "Corriente natural de agua de menor caudal que un río." },
+          { word: "BOSQUE", hint: "Ecosistema densamente poblado de árboles, arbustos y fauna silvestre." },
+          { word: "ESTEPA", hint: "Bioma llano y extenso con vegetación baja adaptado a vientos y clima seco." },
+          { word: "CORDILLERA", hint: "Cadena extensa de montañas enlazadas entre sí." },
+          { word: "LAGUNA", hint: "Depósito natural de agua dulce o salada, generalmente menor que un lago." },
+          { word: "MANANTIAL", hint: "Nacimiento natural de agua que brota de la tierra o entre las rocas." },
+          { word: "ARCOIRIS", hint: "Fenómeno óptico de siete colores que aparece cuando el sol ilumina la lluvia." },
+          { word: "HUMEDAL", hint: "Zona de tierras inundadas fundamental para la biodiversidad y las aves acuáticas." },
+          { word: "SOLSTICIO", hint: "Momento astronómico que marca el día más largo o más corto del año." }
+        ]
+      },
+      cultura: {
+        label: "🎭 Cultura General",
+        words: [
+          { word: "BIBLIOTECA", hint: "Lugar dedicado a conservar, organizar y prestar libros para la lectura." },
+          { word: "BRUJULA", hint: "Instrumento de orientación con una aguja imantada que señala el norte." },
+          { word: "ARCHIPIELAGO", hint: "Conjunto de islas cercanas agrupadas en una misma región del mar." },
+          { word: "CARNAVAL", hint: "Celebración popular llena de música, comparsas, disfraces y color." },
+          { word: "ARTESANIA", hint: "Objeto creado manualmente con técnicas tradicionales y materiales locales." },
+          { word: "PERGAMINO", hint: "Material fabricado con piel de animal usado en la antigüedad para escribir." },
+          { word: "CALENDARIO", hint: "Sistema de división del tiempo en años, meses, semanas y días." },
+          { word: "LABERINTO", hint: "Construcción llena de caminos entrecruzados diseñada para confundir la salida." },
+          { word: "MONUMENTO", hint: "Obra arquitectónica o escultórica erigida para recordar un hecho o personaje." },
+          { word: "TRADICION", hint: "Costumbres, saberes y relatos que se transmiten de generación en generación." },
+          { word: "ACUEDUCTO", hint: "Construcción antigua diseñada para transportar agua a través de largas distancias." },
+          { word: "MAPAMUNDI", hint: "Representación cartográfica de toda la superficie de la Tierra." },
+          { word: "FOLCLORE", hint: "Expresión cultural tradicional de un pueblo: danzas, música, leyendas y coplas." },
+          { word: "EXPEDICION", hint: "Viaje organizado con fines de exploración, descubrimiento o investigación." },
+          { word: "HORIZONTE", hint: "Línea aparente donde parecen juntarse el cielo y la tierra o el mar." },
+          { word: "CASTILLO", hint: "Edificación medieval fortificada con murallas, torres y puente levadizo." },
+          { word: "FAROLERO", hint: "Antiguo oficio de quien encendía las lámparas de las calles al anochecer." },
+          { word: "CUADERNO", hint: "Conjunto de hojas de papel unidas que sirve para tomar notas o dibujar." },
+          { word: "RELATO", hint: "Narración breve de sucesos reales o imaginarios." },
+          { word: "ANCLA", hint: "Pieza pesada de hierro que sujeta una embarcación al fondo del agua." }
+        ]
+      },
+      ciencia: {
+        label: "🔬 Ciencia y Arte",
+        words: [
+          { word: "TELESCOPIO", hint: "Instrumento óptico que permite observar planetas, estrellas y galaxias lejanas." },
+          { word: "MICROSCOPIO", hint: "Herramienta científica para observar células y organismos invisibles a simple vista." },
+          { word: "ACUARELA", hint: "Técnica de pintura sobre papel utilizando pigmentos diluidos en agua." },
+          { word: "ESCULTURA", hint: "Arte de modelar, tallar o esculpir formas en piedra, madera o metal." },
+          { word: "SINFONIA", hint: "Composición musical extensa escrita para ser interpretada por una orquesta." },
+          { word: "GRAVEDAD", hint: "Fuerza natural que atrae los cuerpos con masa hacia el centro de la Tierra." },
+          { word: "MOLECULA", hint: "Partícula formada por dos o más átomos unidos químicamente." },
+          { word: "GALAXIA", hint: "Enorme agrupación de estrellas, planetas, gas y polvo unidos por la gravedad." },
+          { word: "FOTOSINTESIS", hint: "Proceso mediante el cual las plantas transforman la luz solar en energía." },
+          { word: "ASTRONOMIA", hint: "Ciencia que estudia los astros, los planetas y el universo." },
+          { word: "PARTITURA", hint: "Documento escrito donde se representa una obra musical mediante notas." },
+          { word: "METAMORFOSIS", hint: "Transformación biológica profunda, como la de una oruga en mariposa." },
+          { word: "ECOSISTEMA", hint: "Conjunto formado por los seres vivos de un lugar y el medio físico que habitan." },
+          { word: "PENDULO", hint: "Cuerpo suspendido que oscila de un lado a otro bajo la acción de la gravedad." },
+          { word: "CRISTAL", hint: "Sólido cuyos átomos están ordenados en una estructura geométrica regular." },
+          { word: "PALETA", hint: "Tabla con un agujero donde el pintor mezcla sus colores." },
+          { word: "NEBULOSA", hint: "Nube gigante de gas y polvo en el espacio donde nacen nuevas estrellas." },
+          { word: "ALGORITMO", hint: "Conjunto ordenado de pasos lógicos para resolver un problema o tarea." },
+          { word: "CATALIZADOR", hint: "Sustancia que acelera una reacción química sin consumirse en ella." },
+          { word: "SONATA", hint: "Composición musical clásica escrita para uno o dos instrumentos." }
+        ]
+      }
+    };
+
+    /**
+     * =========================================================================
+     * 2. MOTOR DE AUDIO SINTETIZADO (WEB AUDIO API - SIN ARCHIVOS EXTERNOS)
+     * =========================================================================
+     */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            this.ctx = new AudioCtx();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        return this.muted;
+      }
+
+      // Sonido cristalino y alegre al acertar una letra
+      playCorrect() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now); // Do5
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.14); // Sol5
+
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.26);
+      }
+
+      // Sonido de salto + chapoteo de agua cuando un pez escapa
+      playFishSplash() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+
+        // 1. Silbido ascendente/descendente del salto del pez
+        const jumpOsc = this.ctx.createOscillator();
+        const jumpGain = this.ctx.createGain();
+        jumpOsc.type = 'triangle';
+        jumpOsc.frequency.setValueAtTime(280, now);
+        jumpOsc.frequency.exponentialRampToValueAtTime(580, now + 0.22);
+        jumpOsc.frequency.exponentialRampToValueAtTime(220, now + 0.52);
+
+        jumpGain.gain.setValueAtTime(0.14, now);
+        jumpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.54);
+
+        jumpOsc.connect(jumpGain);
+        jumpGain.connect(this.ctx.destination);
+        jumpOsc.start(now);
+        jumpOsc.stop(now + 0.55);
+
+        // 2. Chapoteo al tocar el agua (ruido filtrado + burbuja) después de 0.48s
+        const splashTime = now + 0.48;
+        const bufferSize = this.ctx.sampleRate * 0.35;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.1));
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(900, splashTime);
+        filter.Q.value = 1.4;
+
+        const splashGain = this.ctx.createGain();
+        splashGain.gain.setValueAtTime(0.28, splashTime);
+        splashGain.gain.exponentialRampToValueAtTime(0.001, splashTime + 0.34);
+
+        noise.connect(filter);
+        filter.connect(splashGain);
+        splashGain.connect(this.ctx.destination);
+        noise.start(splashTime);
+
+        // Burbuja final "bloop"
+        const bloop = this.ctx.createOscillator();
+        const bloopGain = this.ctx.createGain();
+        bloop.type = 'sine';
+        bloop.frequency.setValueAtTime(320, splashTime + 0.05);
+        bloop.frequency.exponentialRampToValueAtTime(680, splashTime + 0.18);
+        bloopGain.gain.setValueAtTime(0.15, splashTime + 0.05);
+        bloopGain.gain.exponentialRampToValueAtTime(0.001, splashTime + 0.2);
+
+        bloop.connect(bloopGain);
+        bloopGain.connect(this.ctx.destination);
+        bloop.start(splashTime + 0.05);
+        bloop.stop(splashTime + 0.21);
+      }
+
+      // Melodía de victoria
+      playWin() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // Do5, Mi5, Sol5, Do6
+        const now = this.ctx.currentTime;
+
+        notes.forEach((freq, idx) => {
+          const start = now + idx * 0.11;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, start);
+
+          gain.gain.setValueAtTime(0.18, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(start);
+          osc.stop(start + 0.36);
+        });
+      }
+
+      // Melodía simpática cuando los 5 peces se liberan al río
+      playFishFreedom() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const notes = [440, 493.88, 523.25, 587.33, 659.25];
+        const now = this.ctx.currentTime + 0.55;
+
+        notes.forEach((freq, idx) => {
+          const start = now + idx * 0.09;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, start);
+
+          gain.gain.setValueAtTime(0.14, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.28);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(start);
+          osc.stop(start + 0.3);
+        });
+      }
+    }
+
+    const sound = new SoundEngine();
+
+    /**
+     * =========================================================================
+     * 3. ESTADO DEL JUEGO Y CONFIGURACIÓN
+     * =========================================================================
+     */
+    const MAX_FISH = 5;
+    const FISH_PALETTE = [
+      { body: '#facc15', fin: '#ca8a04', name: 'Dorado' },
+      { body: '#fb923c', fin: '#c2410c', name: 'Salmón' },
+      { body: '#2dd4bf', fin: '#0f766e', name: 'Trucha' },
+      { body: '#f472b6', fin: '#be185d', name: 'Coral' },
+      { body: '#60a5fa', fin: '#1d4ed8', name: 'Azul' }
+    ];
+
+    const KEYBOARD_ROWS = [
+      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+      ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
+      ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
+    ];
+
+    const state = {
+      category: 'todas',
+      currentEntry: null,
+      guessedLetters: new Set(),
+      fishRemaining: MAX_FISH,
+      streak: 0,
+      gameOver: false,
+      usedWords: new Set(),
+      swimmingIntervals: []
+    };
+
+    // Referencias DOM
+    const elWordContainer = document.getElementById('word-container');
+    const elKeyboardContainer = document.getElementById('keyboard-container');
+    const elFishHearts = document.getElementById('fish-hearts');
+    const elFishCounterText = document.getElementById('fish-counter-text');
+    const elCategorySelect = document.getElementById('category-select');
+    const elCategoryBadge = document.getElementById('current-category-badge');
+    const elStatusMessage = document.getElementById('status-message');
+    const elStreakCount = document.getElementById('streak-count');
+    const elHintBtn = document.getElementById('hint-btn');
+    const elHintBanner = document.getElementById('hint-banner');
+    const elHintText = document.getElementById('hint-text');
+    const elCloseHintBtn = document.getElementById('close-hint-btn');
+    const elSkipBtn = document.getElementById('skip-btn');
+    const elAudioToggle = document.getElementById('audio-toggle');
+    const elModal = document.getElementById('endgame-modal');
+    const elModalCard = document.getElementById('endgame-card');
+    const elPlayAgainBtn = document.getElementById('play-again-btn');
+
+    // Capas SVG
+    const svgBasketGroup = document.getElementById('basket-group');
+    const svgJumpingLayer = document.getElementById('jumping-fish-layer');
+    const svgSplashesLayer = document.getElementById('splashes-layer');
+    const svgSwimmingLayer = document.getElementById('swimming-fish-layer');
+    const svgFisherMouth = document.getElementById('fisher-mouth');
+
+    /**
+     * =========================================================================
+     * 4. ANIMACIONES SVG DE PECES (SALTO PARABÓLICO, CHAPOTEO Y NADO LIBRE)
+     * =========================================================================
+     */
+    function animateFishEscape(fishIndex) {
+      const palette = FISH_PALETTE[fishIndex % FISH_PALETTE.length];
+
+      // 1. Ocultar el pez dentro de la cesta y sacudir la cesta
+      const fishInBasket = document.getElementById(`fish-in-${fishIndex}`);
+      if (fishInBasket) {
+        fishInBasket.style.display = 'none';
+      }
+
+      svgBasketGroup.classList.remove('basket-shake');
+      void svgBasketGroup.offsetWidth; // Reiniciar animación CSS
+      svgBasketGroup.classList.add('basket-shake');
+
+      // Expresión de sorpresa del pescador
+      svgFisherMouth.setAttribute('d', 'M187,154 A3,3 0 1,0 193,154 A3,3 0 1,0 187,154');
+      setTimeout(() => {
+        if (!state.gameOver) {
+          svgFisherMouth.setAttribute('d', 'M185,153 Q190,157 194,152');
+        }
+      }, 900);
+
+      // 2. Crear pez SVG para el salto parabólico
+      const ns = 'http://www.w3.org/2000/svg';
+      const jumper = document.createElementNS(ns, 'g');
+      jumper.innerHTML = `
+        <path d="M12,0 C12,0 6,-8 -4,-8 C-10,-8 -14,-3 -14,0 C-14,3 -10,8 -4,8 C6,8 12,0 12,0 Z" fill="${palette.body}" stroke="${palette.fin}" stroke-width="1.5"/>
+        <path d="M-13,0 L-20,-6 L-20,6 Z" fill="${palette.fin}"/>
+        <circle cx="5" cy="-2" r="1.6" fill="#0f172a"/>
+      `;
+      svgJumpingLayer.appendChild(jumper);
+
+      // Coordenadas de la parábola: desde la cesta (278, 195) hasta el agua (440..660, 245..285)
+      const startX = 278;
+      const startY = 192;
+      const endX = 430 + fishIndex * 52 + (Math.random() * 25 - 12);
+      const endY = 248 + (fishIndex % 3) * 18;
+      const peakHeight = 95 + (fishIndex % 2) * 20;
+      const duration = 540; // ms
+      const startTime = performance.now();
+
+      function stepJump(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+
+        // Interpolación lineal en X y parábola cuadrática en Y
+        const x = startX + (endX - startX) * t;
+        const linearY = startY + (endY - startY) * t;
+        const arcOffset = 4 * peakHeight * t * (1 - t);
+        const y = linearY - arcOffset;
+
+        // Calcular ángulo tangente a la trayectoria para rotar el pez naturalmente
+        const dx = endX - startX;
+        const dy = (endY - startY) - 4 * peakHeight * (1 - 2 * t);
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+        jumper.setAttribute('transform', `translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${angle.toFixed(1)})`);
+
+        if (t < 1) {
+          requestAnimationFrame(stepJump);
+        } else {
+          // El pez tocó el agua: eliminar el saltador, crear chapoteo y pasarlo a nadar libremente
+          jumper.remove();
+          createWaterSplash(endX, endY);
+          spawnSwimmingFish(endX, endY, palette);
+        }
+      }
+
+      requestAnimationFrame(stepJump);
+    }
+
+    // Genera ondas concéntricas y gotas en el punto de impacto con el agua
+    function createWaterSplash(x, y) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const splashGroup = document.createElementNS(ns, 'g');
+      svgSplashesLayer.appendChild(splashGroup);
+
+      const startTime = performance.now();
+      const duration = 650;
+
+      function stepSplash(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const r1 = 6 + t * 34;
+        const r2 = 2 + t * 20;
+        const opacity = 1 - t;
+
+        // Gotas saltando hacia arriba
+        const dropOffset = Math.sin(t * Math.PI) * 18;
+
+        splashGroup.innerHTML = `
+          <ellipse cx="${x}" cy="${y}" rx="${r1}" ry="${r1 * 0.35}" fill="none" stroke="#ffffff" stroke-width="2" opacity="${opacity}" />
+          <ellipse cx="${x}" cy="${y}" rx="${r2}" ry="${r2 * 0.35}" fill="none" stroke="#bae6fd" stroke-width="1.5" opacity="${opacity}" />
+          <circle cx="${x - 10 - t * 12}" cy="${y - dropOffset}" r="2.2" fill="#e0f2fe" opacity="${opacity}" />
+          <circle cx="${x + 10 + t * 12}" cy="${y - dropOffset * 1.15}" r="2.2" fill="#e0f2fe" opacity="${opacity}" />
+          <circle cx="${x}" cy="${y - dropOffset * 1.3}" r="2.5" fill="#ffffff" opacity="${opacity}" />
+        `;
+
+        if (t < 1) {
+          requestAnimationFrame(stepSplash);
+        } else {
+          splashGroup.remove();
+        }
+      }
+
+      requestAnimationFrame(stepSplash);
+    }
+
+    // Crea un pez libre nadando felizmente de un lado a otro en el río
+    function spawnSwimmingFish(startX, startY, palette) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const swimmer = document.createElementNS(ns, 'g');
+      swimmer.innerHTML = `
+        <path d="M11,0 C11,0 5,-6.5 -4,-6.5 C-9,-6.5 -12,-2.5 -12,0 C-12,2.5 -9,6.5 -4,6.5 C5,6.5 11,0 11,0 Z" fill="${palette.body}" stroke="${palette.fin}" stroke-width="1.2"/>
+        <path d="M-11,0 L-17,-5 L-17,5 Z" fill="${palette.fin}"/>
+        <circle cx="4.5" cy="-1.5" r="1.4" fill="#0f172a"/>
+      `;
+      svgSwimmingLayer.appendChild(swimmer);
+
+      let x = startX;
+      let baseY = Math.max(238, Math.min(298, startY));
+      let direction = Math.random() > 0.35 ? 1 : -1;
+      const speed = 0.45 + Math.random() * 0.35;
+      const minX = 365;
+      const maxX = 770;
+      let phase = Math.random() * Math.PI * 2;
+      let active = true;
+
+      function swimLoop() {
+        if (!active || !swimmer.isConnected) return;
+        phase += 0.06;
+        x += speed * direction;
+
+        if (x >= maxX) {
+          x = maxX;
+          direction = -1;
+        } else if (x <= minX) {
+          x = minX;
+          direction = 1;
+        }
+
+        const y = baseY + Math.sin(phase) * 3;
+        const wiggle = Math.sin(phase * 2.2) * 5;
+        swimmer.setAttribute('transform', `translate(${x.toFixed(1)}, ${y.toFixed(1)}) scale(${direction}, 1) rotate(${wiggle.toFixed(1)})`);
+        requestAnimationFrame(swimLoop);
+      }
+
+      const id = requestAnimationFrame(swimLoop);
+      state.swimmingIntervals.push(() => { active = false; cancelAnimationFrame(id); });
+    }
+
+    // Restaura la cesta con los 5 peces al iniciar nueva partida
+    function resetSceneVisuals() {
+      state.swimmingIntervals.forEach(stopFn => stopFn());
+      state.swimmingIntervals = [];
+      svgJumpingLayer.innerHTML = '';
+      svgSplashesLayer.innerHTML = '';
+      svgSwimmingLayer.innerHTML = '';
+
+      for (let i = 0; i < MAX_FISH; i++) {
+        const fishInBasket = document.getElementById(`fish-in-${i}`);
+        if (fishInBasket) {
+          fishInBasket.style.display = 'inline';
+        }
+      }
+      svgFisherMouth.setAttribute('d', 'M185,153 Q190,157 194,152');
+    }
+
+    /**
+     * =========================================================================
+     * 5. LÓGICA PRINCIPAL DE LA PARTIDA
+     * =========================================================================
+     */
+    function getRandomWordEntry(categoryKey) {
+      let pool = [];
+      if (categoryKey === 'todas') {
+        Object.entries(WORD_BANK).forEach(([key, cat]) => {
+          cat.words.forEach(item => {
+            pool.push({ ...item, categoryLabel: cat.label });
+          });
+        });
+      } else {
+        const cat = WORD_BANK[categoryKey];
+        pool = cat.words.map(item => ({ ...item, categoryLabel: cat.label }));
+      }
+
+      // Filtrar palabras ya jugadas en esta sesión para evitar repeticiones
+      let available = pool.filter(item => !state.usedWords.has(item.word));
+      if (available.length === 0) {
+        state.usedWords.clear();
+        available = pool;
+      }
+
+      const chosen = available[Math.floor(Math.random() * available.length)];
+      state.usedWords.add(chosen.word);
+      return chosen;
+    }
+
+    function startNewRound() {
+      state.currentEntry = getRandomWordEntry(state.category);
+      state.guessedLetters.clear();
+      state.fishRemaining = MAX_FISH;
+      state.gameOver = false;
+
+      // Actualizar UI
+      elCategoryBadge.textContent = state.currentEntry.categoryLabel;
+      elStatusMessage.textContent = '¡Adivina la palabra antes de que escapen los 5 peces!';
+      elStatusMessage.className = 'text-xs sm:text-sm font-bold text-slate-600';
+      elHintBanner.classList.add('hidden');
+      elHintText.textContent = state.currentEntry.hint;
+
+      resetSceneVisuals();
+      renderFishCounter();
+      renderWordSlots();
+      renderKeyboard();
+      hideModal();
+    }
+
+    function renderFishCounter() {
+      elFishHearts.innerHTML = '';
+      for (let i = 0; i < MAX_FISH; i++) {
+        const isPresent = i < state.fishRemaining;
+        const span = document.createElement('span');
+        span.className = `text-base sm:text-lg transition-all duration-300 ${isPresent ? 'scale-100 opacity-100' : 'scale-75 opacity-25 grayscale'}`;
+        span.textContent = '🐟';
+        elFishHearts.appendChild(span);
+      }
+      elFishCounterText.textContent = `${state.fishRemaining}/${MAX_FISH}`;
+      if (state.fishRemaining <= 1) {
+        elFishCounterText.className = 'text-xs sm:text-sm font-black text-rose-700 ml-1 bg-rose-100 px-2 py-0.5 rounded-lg animate-pulse';
+      } else {
+        elFishCounterText.className = 'text-xs sm:text-sm font-black text-sky-700 ml-1 bg-sky-100 px-2 py-0.5 rounded-lg';
+      }
+    }
+
+    function renderWordSlots() {
+      elWordContainer.innerHTML = '';
+      const targetWord = state.currentEntry.word;
+
+      for (let i = 0; i < targetWord.length; i++) {
+        const char = targetWord[i];
+        const isGuessed = state.guessedLetters.has(char);
+
+        const slot = document.createElement('div');
+        slot.className = `w-9 h-11 sm:w-12 sm:h-14 rounded-xl border-b-4 flex items-center justify-center font-display font-bold text-xl sm:text-3xl transition-all ${
+          isGuessed
+            ? 'bg-emerald-50 border-emerald-500 text-emerald-900 shadow-sm'
+            : 'bg-sky-50/90 border-sky-300 text-transparent'
+        }`;
+
+        if (isGuessed) {
+          const letterSpan = document.createElement('span');
+          letterSpan.textContent = char;
+          letterSpan.className = 'letter-revealed';
+          slot.appendChild(letterSpan);
+        }
+
+        elWordContainer.appendChild(slot);
+      }
+    }
+
+    function renderKeyboard() {
+      elKeyboardContainer.innerHTML = '';
+
+      KEYBOARD_ROWS.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'flex justify-center gap-1 sm:gap-1.5';
+
+        row.forEach(letter => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = letter;
+          btn.dataset.letter = letter;
+          btn.className = 'key-btn flex-1 max-w-[44px] sm:max-w-[52px] h-10 sm:h-12 rounded-xl bg-white border-2 border-slate-200 font-display font-bold text-base sm:text-lg text-slate-800 flex items-center justify-center cursor-pointer';
+
+          if (state.guessedLetters.has(letter)) {
+            btn.disabled = true;
+            if (state.currentEntry.word.includes(letter)) {
+              btn.classList.add('key-correct');
+            } else {
+              btn.classList.add('key-wrong');
+            }
+          } else if (state.gameOver) {
+            btn.disabled = true;
+          }
+
+          btn.addEventListener('click', () => handleLetterGuess(letter));
+          rowDiv.appendChild(btn);
+        });
+
+        elKeyboardContainer.appendChild(rowDiv);
+      });
+    }
+
+    function handleLetterGuess(rawLetter) {
+      if (state.gameOver) return;
+
+      const letter = normalizeSpanishLetter(rawLetter);
+      if (!letter || state.guessedLetters.has(letter)) return;
+
+      state.guessedLetters.add(letter);
+      const targetWord = state.currentEntry.word;
+
+      if (targetWord.includes(letter)) {
+        // ACIERTO
+        sound.playCorrect();
+        elStatusMessage.textContent = `¡Bien hecho! La letra "${letter}" está en la palabra.`;
+        elStatusMessage.className = 'text-xs sm:text-sm font-extrabold text-emerald-700';
+
+        renderWordSlots();
+        renderKeyboard();
+        checkWinCondition();
+      } else {
+        // ERROR: Escapa un pez de la cesta
+        const escapingFishIndex = MAX_FISH - state.fishRemaining;
+        state.fishRemaining = Math.max(0, state.fishRemaining - 1);
+
+        sound.playFishSplash();
+        animateFishEscape(escapingFishIndex);
+        renderFishCounter();
+        renderKeyboard();
+
+        if (state.fishRemaining > 0) {
+          elStatusMessage.textContent = `¡Splash! La "${letter}" no está. Escapó un pez al río (${state.fishRemaining} restantes).`;
+          elStatusMessage.className = 'text-xs sm:text-sm font-extrabold text-amber-700';
+        } else {
+          handleLoseCondition();
+        }
+      }
+    }
+
+    function checkWinCondition() {
+      const targetWord = state.currentEntry.word;
+      const allRevealed = [...targetWord].every(char => state.guessedLetters.has(char));
+
+      if (allRevealed) {
+        state.gameOver = true;
+        state.streak += 1;
+        elStreakCount.textContent = state.streak;
+        sound.playWin();
+        renderKeyboard();
+
+        setTimeout(() => {
+          showEndModal(true);
+        }, 550);
+      }
+    }
+
+    function handleLoseCondition() {
+      state.gameOver = true;
+      state.streak = 0;
+      elStreakCount.textContent = state.streak;
+      sound.playFishFreedom();
+      renderKeyboard();
+
+      elStatusMessage.textContent = '¡Los 5 peces saltaron al agua y nadan libres por el río!';
+      elStatusMessage.className = 'text-xs sm:text-sm font-extrabold text-sky-700';
+
+      setTimeout(() => {
+        showEndModal(false);
+      }, 950);
+    }
+
+    function showEndModal(isVictory) {
+      const elEmoji = document.getElementById('modal-emoji');
+      const elTitle = document.getElementById('modal-title');
+      const elSubtitle = document.getElementById('modal-subtitle');
+      const elWord = document.getElementById('modal-word');
+      const elFact = document.getElementById('modal-fact');
+
+      elWord.textContent = state.currentEntry.word;
+      elFact.textContent = state.currentEntry.hint;
+
+      if (isVictory) {
+        elEmoji.textContent = '🏆';
+        elEmoji.className = 'w-20 h-20 mx-auto mb-3 rounded-full bg-amber-100 flex items-center justify-center text-4xl sm:text-5xl shadow-inner';
+        elTitle.textContent = '¡Palabra Adivinada!';
+        elTitle.className = 'text-2xl sm:text-3xl font-extrabold text-emerald-700 mb-1';
+        elSubtitle.textContent = `¡Excelente trabajo! Conservaste ${state.fishRemaining} ${state.fishRemaining === 1 ? 'pez' : 'peces'} en la cesta.`;
+        elModalCard.className = 'bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-4 border-emerald-300 text-center transform scale-100 transition-transform';
+      } else {
+        elEmoji.textContent = '🐟💦';
+        elEmoji.className = 'w-20 h-20 mx-auto mb-3 rounded-full bg-sky-100 flex items-center justify-center text-4xl sm:text-5xl shadow-inner';
+        elTitle.textContent = '¡Libertad para los Peces!';
+        elTitle.className = 'text-2xl sm:text-3xl font-extrabold text-sky-800 mb-1';
+        elSubtitle.textContent = '¡Los 5 peces lograron escapar de la cesta y ahora nadan felices en el río patagónico!';
+        elModalCard.className = 'bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border-4 border-sky-300 text-center transform scale-100 transition-transform';
+      }
+
+      elModal.classList.remove('hidden');
+      elModal.classList.add('flex');
+    }
+
+    function hideModal() {
+      elModal.classList.add('hidden');
+      elModal.classList.remove('flex');
+    }
+
+    // Normaliza letras del teclado físico (incluye Ñ y quita tildes accidentales)
+    function normalizeSpanishLetter(char) {
+      if (!char || char.length !== 1) return null;
+      const upper = char.toUpperCase();
+      if (upper === 'Ñ') return 'Ñ';
+      const noAccent = upper.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      return /^[A-Z]$/.test(noAccent) ? noAccent : null;
+    }
+
+    /**
+     * =========================================================================
+     * 6. EVENT LISTENERS E INICIALIZACIÓN
+     * =========================================================================
+     */
+    elCategorySelect.addEventListener('change', (e) => {
+      state.category = e.target.value;
+      startNewRound();
+    });
+
+    elHintBtn.addEventListener('click', () => {
+      elHintBanner.classList.toggle('hidden');
+    });
+
+    elCloseHintBtn.addEventListener('click', () => {
+      elHintBanner.classList.add('hidden');
+    });
+
+    elSkipBtn.addEventListener('click', () => {
+      startNewRound();
+    });
+
+    elPlayAgainBtn.addEventListener('click', () => {
+      startNewRound();
+    });
+
+    elAudioToggle.addEventListener('click', () => {
+      const muted = sound.toggleMute();
+      document.getElementById('icon-sound-on').classList.toggle('hidden', muted);
+      document.getElementById('icon-sound-off').classList.toggle('hidden', !muted);
+    });
+
+    // Soporte completo para teclado físico
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (!elModal.classList.contains('hidden')) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          startNewRound();
+        }
+        return;
+      }
+      const validLetter = normalizeSpanishLetter(e.key);
+      if (validLetter) {
+        e.preventDefault();
+        handleLetterGuess(validLetter);
+      }
+    });
+
+    // Iniciar la primera partida al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      startNewRound();
+    });
+  </script>
+</body>
+</html>
