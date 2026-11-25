@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Pescador · Artes Visuales</title>
+<style>
+  :root {
+    --ivory: #f8f4ea;
+    --paper: rgba(255, 255, 255, 0.8);
+    --ink: #2a2622;
+    --muted: #7a7066;
+    --gold: #b08d57;
+    --gold-soft: #e9dcc2;
+    --teal: #1f4e5a;
+    --line: #d9cdb6;
+    --rose: #8b3a3a;
+    --green: #2f6b4f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100vh;
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    background: radial-gradient(circle at top, #fffdf7 0%, var(--ivory) 45%, #efe6d2 100%);
+    display: flex; justify-content: center;
+    padding: 16px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: 0 12px 30px -14px rgba(42, 38, 34, 0.28);
+    backdrop-filter: blur(6px);
+  }
+
+  header.card {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 14px 18px;
+  }
+  .brand h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 0.5px; color: var(--teal); }
+  .brand p { margin: 3px 0 0; font-size: 10.5px; letter-spacing: 2.6px; text-transform: uppercase; color: var(--gold); }
+  .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  select, .btn {
+    font-family: inherit; font-size: 14px; color: var(--ink);
+    background: #fff; border: 1px solid var(--line); border-radius: 12px;
+    padding: 8px 12px; cursor: pointer; transition: all 0.2s ease;
+  }
+  select:focus, .btn:focus { outline: none; border-color: var(--gold); }
+  .btn:hover { border-color: var(--gold); background: #fffdf8; }
+  .btn:active { transform: scale(0.97); }
+  .streak {
+    display: flex; flex-direction: column; align-items: center; padding: 4px 12px;
+    border: 1px solid var(--gold-soft); border-radius: 12px; background: #fdf8ee;
+  }
+  .streak small { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+  .streak span { font-size: 16px; font-weight: 700; color: var(--teal); line-height: 1.1; }
+  .audio-btn { padding: 8px 10px; line-height: 0; }
+  .audio-btn svg { width: 18px; height: 18px; stroke: var(--teal); fill: none; stroke-width: 1.8; }
+
+  .stage {
+    padding: 18px 18px 22px; display: flex; flex-direction: column; align-items: center; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+  .stage-top { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--teal);
+    border: 1px solid var(--gold); border-radius: 999px; padding: 6px 14px; background: #fffdf8;
+  }
+  .basket { display: flex; align-items: center; gap: 8px; }
+  .basket-label { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .fish-row { display: flex; align-items: center; gap: 4px; }
+  .fish { width: 30px; height: 20px; transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease; }
+  .fish svg { width: 100%; height: 100%; display: block; }
+  .fish.gone { opacity: 0.15; filter: grayscale(1); transform: scale(0.8); }
+  .count { font-size: 13px; font-weight: 700; color: var(--teal); margin-left: 4px; }
+
+  .status { font-size: 15px; font-style: italic; color: var(--muted); text-align: center; min-height: 22px; }
+  .status.ok { color: var(--green); font-style: normal; font-weight: 700; }
+  .status.bad { color: var(--rose); font-style: normal; font-weight: 700; }
+
+  .word { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 56px; }
+  .slot {
+    width: 36px; height: 48px; display: flex; align-items: center; justify-content: center;
+    border-bottom: 2px solid var(--gold); font-size: 26px; font-weight: 600; color: var(--teal);
+  }
+  .slot span { opacity: 0; transform: translateY(6px); transition: all 0.35s ease; }
+  .slot.open span { opacity: 1; transform: translateY(0); }
+
+  .hint-box {
+    width: 100%; background: #fdf8ee; border: 1px solid var(--gold-soft); border-radius: 16px;
+    padding: 12px 16px; font-size: 14px; line-height: 1.5; color: var(--ink); text-align: center;
+  }
+  .hint-box.hidden { display: none; }
+  .hint-box b {
+    display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 4px; font-weight: 700;
+  }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+  .keyboard { padding: 14px 12px 16px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .krow { display: flex; gap: 6px; justify-content: center; width: 100%; }
+  .key {
+    flex: 1; max-width: 50px; height: 44px; border-radius: 12px; border: 1px solid var(--line);
+    background: #fff; color: var(--ink); font-family: inherit; font-size: 17px; cursor: pointer;
+    transition: all 0.18s ease; box-shadow: 0 2px 0 var(--line);
+  }
+  .key:hover:not(:disabled) { border-color: var(--gold); transform: translateY(-1px); }
+  .key:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+  .key:disabled { cursor: default; }
+  .key.hit { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: none; }
+  .key.miss { background: #f1ece2; color: #b5aa98; border-color: #ebe3d3; box-shadow: none; }
+
+  .escapee {
+    position: absolute; top: 78px; left: 50%; width: 46px; height: 28px; pointer-events: none; z-index: 5;
+    animation: escape 1.1s cubic-bezier(.3,.6,.4,1) forwards;
+  }
+  .escapee svg { width: 100%; height: 100%; }
+  @keyframes escape {
+    0%   { transform: translate(-50%, 0) rotate(0deg); opacity: 1; }
+    45%  { transform: translate(60px, -60px) rotate(-18deg); opacity: 1; }
+    100% { transform: translate(160px, 90px) rotate(30deg); opacity: 0; }
+  }
+  .ripple {
+    position: absolute; bottom: 14px; left: 50%; width: 80px; height: 14px; margin-left: -40px;
+    border: 2px solid var(--teal); border-radius: 50%; opacity: 0; pointer-events: none;
+    animation: ripple 0.9s ease-out forwards;
+  }
+  @keyframes ripple {
+    0% { transform: scale(0.3); opacity: 0.8; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+  .shake { animation: shake 0.45s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .foot { text-align: center; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 4px 0 2px; }
+
+  #modal {
+    position: fixed; inset: 0; z-index: 50; background: rgba(42, 38, 34, 0.45);
+    backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 18px;
+  }
+  #modal.open { display: flex; }
+  .modal-card {
+    background: #fffdf8; border: 1px solid var(--gold-soft); border-radius: 24px; padding: 28px 24px;
+    max-width: 380px; width: 100%; text-align: center; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35);
+    animation: rise 0.45s ease;
+  }
+  @keyframes rise { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-card .eyebrow { font-size: 10.5px; letter-spacing: 2.6px; text-transform: uppercase; color: var(--gold); }
+  .modal-card h2 { margin: 6px 0 10px; font-size: 24px; font-weight: 600; color: var(--teal); }
+  .modal-card .answer { font-size: 28px; letter-spacing: 3px; color: var(--ink); margin: 8px 0; font-weight: 600; word-break: break-word; }
+  .modal-card p { font-size: 14px; line-height: 1.55; color: var(--muted); margin: 6px 0 18px; }
+  .modal-card .btn { width: 100%; padding: 12px; font-size: 16px; background: var(--teal); color: #fff; border-color: var(--teal); }
+  .modal-card .btn:hover { background: #173d47; }
+
+  @media (max-width: 420px) {
+    .brand h1 { font-size: 22px; }
+    .slot { width: 30px; height: 42px; font-size: 22px; }
+    .key { height: 40px; font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="card">
+    <div class="brand">
+      <h1>El Pescador</h1>
+      <p>Juego de palabras · Artes Visuales</p>
+    </div>
+    <div class="controls">
+      <select id="category" aria-label="Categoría">
+        <option value="todas">Todas las categorías</option>
+        <option value="dibujo">Dibujo Artístico</option>
+        <option value="escultura">Escultura</option>
+        <option value="grabado">Grabado Artístico</option>
+        <option value="pintura">Pintura</option>
+      </select>
+      <div class="streak" title="Palabras adivinadas seguidas">
+        <small>Racha</small>
+        <span id="streak">0</span>
+      </div>
+      <button id="audio" class="btn audio-btn" aria-label="Activar o silenciar sonido" title="Sonido">
+        <svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="card stage" id="stage">
+    <div class="stage-top">
+      <span class="badge" id="badge">Pintura</span>
+      <div class="basket">
+        <span class="basket-label">Cesta</span>
+        <div class="fish-row" id="fish-row"></div>
+        <span class="count" id="count">5/5</span>
+      </div>
+    </div>
+
+    <div class="status" id="status">Adivine la palabra antes de que escapen los peces.</div>
+
+    <div class="word" id="word" aria-label="Palabra secreta"></div>
+
+    <div class="hint-box hidden" id="hint">
+      <b>Definición</b>
+      <span id="hint-text"></span>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="hint-btn">Pista</button>
+      <button class="btn" id="skip-btn">Otra palabra</button>
+    </div>
+  </section>
+
+  <section class="card keyboard" id="keyboard"></section>
+
+  <div class="foot">Use el teclado de la pantalla o el de su computadora</div>
+</div>
+
+<div id="modal">
+  <div class="modal-card">
+    <div class="eyebrow" id="m-eyebrow"></div>
+    <h2 id="m-title"></h2>
+    <div class="answer" id="m-word"></div>
+    <p id="m-def"></p>
+    <button class="btn" id="m-btn">Jugar otra vez</button>
+  </div>
+</div>
+
+<script>
+/* ========================================================
+   BANCO DE PALABRAS · 100 por categoría
+   Pistas: definiciones de diccionario
+   ======================================================== */
+const CATEGORIES = {
+  dibujo: {
+    label: "Dibujo Artístico",
+    words: [
+      ["LÁPIZ","Instrumento de escritura o dibujo formado por una mina de grafito encerrada en un cilindro de madera."],
+      ["CARBONCILLO","Barrita de carbón vegetal que se usa para dibujar con trazos oscuros y suaves."],
+      ["SANGUINA","Barra de tierra rojiza con la que se dibuja sobre papel."],
+      ["BOSQUEJO","Dibujo rápido que recoge las ideas principales de una obra antes de terminarla."],
+      ["BORRADOR","Objeto de goma que sirve para eliminar las marcas de lápiz sobre el papel."],
+      ["DIFUMINO","Rollo de papel o fieltro que sirve para extender y suavizar los trazos."],
+      ["GRAFITO","Forma de carbono que constituye la mina de los lápices."],
+      ["TRAMA","Conjunto de líneas entrecruzadas que producen un efecto de tono."],
+      ["CUADRÍCULA","Red de líneas que divide la hoja en cuadrados para copiar un dibujo con precisión."],
+      ["ANATOMÍA","Estudio de la forma y la estructura del cuerpo humano o animal."],
+      ["CONTORNO","Línea que delimita la forma exterior de un objeto o de una figura."],
+      ["APUNTE","Dibujo rápido tomado del natural, sin detenerse en los detalles."],
+      ["TRAZO","Línea que se traza con un instrumento sobre una superficie."],
+      ["ACHURADO","Sombreado hecho con líneas paralelas o cruzadas que producen tonos oscuros."],
+      ["HACHURA","Línea trazada muy cerca de otras para dar sombra en el dibujo."],
+      ["SOMBREADO","Aplicación de tonos oscuros para dar sensación de volumen."],
+      ["VOLUMEN","Sensación de tridimensionalidad que se logra sobre una superficie plana."],
+      ["PROPORCIÓN","Relación de tamaño entre las distintas partes de una figura."],
+      ["ENCUADRE","Selección de lo que aparece dentro de los límites de la hoja."],
+      ["MODELO","Persona u objeto que se dibuja tomándolo como referencia del natural."],
+      ["GESTO","Dibujo rápido que captura el movimiento y la actitud de una figura."],
+      ["ESQUEMA","Representación simplificada de una figura con sus rasgos básicos."],
+      ["ALZADO","Dibujo de la vista frontal de un objeto, un edificio o una pieza."],
+      ["PLANTA","Dibujo de un objeto o de un edificio visto desde arriba."],
+      ["ESCALA","Relación entre el tamaño del dibujo y el tamaño real de lo representado."],
+      ["MEDIDA","Dimensión precisa que se toma de un objeto o de una figura."],
+      ["RASGO","Línea o detalle característico que define una figura o un rostro."],
+      ["PAPEL","Hoja fabricada con fibras vegetales, soporte habitual del dibujo."],
+      ["CARTULINA","Cartón fino y liso que sirve como soporte para dibujar o pintar."],
+      ["GRAMAJE","Peso del papel expresado en gramos por metro cuadrado."],
+      ["PORTAMINAS","Lápiz de mina fina que se repone sin necesidad de afilarlo."],
+      ["LAPICERA","Instrumento de punta fina para escribir o dibujar con tinta."],
+      ["PLUMA","Instrumento de punta metálica que se usa para trazar líneas con tinta."],
+      ["MINA","Parte del lápiz que deja la marca sobre el papel."],
+      ["TIZA","Barra de yeso coloreado que sirve para dibujar sobre superficies."],
+      ["CRAYÓN","Barra de cera o pigmento que se usa para dibujar y colorear."],
+      ["CALCO","Copia de un dibujo que se obtiene al trasladarlo por transparencia."],
+      ["ENTINTADO","Acción de cubrir con tinta un dibujo hecho previamente a lápiz."],
+      ["ESFUMADO","Técnica que difumina el grafito para lograr transiciones suaves de tono."],
+      ["ESTILIZADO","Dicho de una forma: simplificada, con rasgos reducidos a lo esencial."],
+      ["DIBUJANTE","Persona que dibuja como profesión o como arte."],
+      ["ILUSTRACIÓN","Dibujo que acompaña, explica o adorna un texto."],
+      ["VIÑETA","Dibujo pequeño que decora el inicio o el borde de un texto."],
+      ["HISTORIETA","Relato contado mediante una secuencia de dibujos con textos."],
+      ["CÓMIC","Historieta publicada en viñetas, con dibujos y diálogos."],
+      ["CALIGRAFÍA","Arte de escribir con letra bella, cuidada y ordenada."],
+      ["ROSTRO","Parte delantera de la cabeza, donde se ubican los ojos, la nariz y la boca."],
+      ["PERFIL","Vista lateral de una figura o de un rostro."],
+      ["DESNUDO","Figura humana representada sin ropa, tema clásico del dibujo académico."],
+      ["ACADEMIA","Escuela de arte donde se estudia el dibujo a partir del modelo."],
+      ["GOMA","Material que sirve para borrar las marcas de lápiz sobre el papel."],
+      ["SACAPUNTAS","Objeto que sirve para afilar lápices y crayones."],
+      ["ATRIL","Soporte inclinado donde se apoya la hoja para dibujar cómodamente."],
+      ["CARPETA","Estuche o funda para guardar y proteger dibujos y papeles."],
+      ["PORTAFOLIO","Carpeta que reúne una selección de trabajos para mostrar."],
+      ["FIRMEZA","Seguridad y precisión de los trazos al dibujar."],
+      ["DELINEADO","Acción de trazar con precisión el contorno de una figura."],
+      ["DIBUJO","Representación gráfica de formas realizadas mediante líneas y tonos."],
+      ["GRAFISMO","Conjunto de marcas gráficas propias de cada artista."],
+      ["MODELADO","Representación del volumen mediante luces y sombras."],
+      ["BLANCO","Zona del papel que se deja sin marcar para representar la luz."],
+      ["DEGRADÉ","Paso gradual de un tono oscuro a uno claro."],
+      ["PUNTEADO","Técnica que produce tonos mediante pequeños puntos."],
+      ["CUADERNO","Conjunto de hojas unidas que sirven para dibujar o escribir."],
+      ["BLOCK","Cuaderno de hojas sueltas o encoladas, destinado a dibujar."],
+      ["TEXTURA","Aspecto de una superficie que se logra con trazos, tramas o granos."],
+      ["RITMO","Repetición ordenada de trazos, líneas o formas en la hoja."],
+      ["EQUILIBRIO","Distribución armónica de los pesos visuales dentro de la hoja."],
+      ["MOVIMIENTO","Sensación de desplazamiento que transmite un dibujo."],
+      ["DINAMISMO","Energía visual que transmiten los trazos de una obra."],
+      ["EXPRESIÓN","Capacidad de un dibujo para transmitir emociones."],
+      ["SILUETA","Contorno de una figura rellenado con un solo tono."],
+      ["SIMETRÍA","Correspondencia exacta entre dos mitades opuestas de una figura."],
+      ["GEOMETRÍA","Estudio de las formas, las medidas y las relaciones en el espacio."],
+      ["ESPACIO","Área libre o llena que organiza la composición de la hoja."],
+      ["PERSPECTIVA","Técnica que representa la profundidad sobre una superficie plana."],
+      ["LÍNEA","Trazo continuo que une dos puntos en el plano."],
+      ["VERTICAL","Dicho de una línea: que va de arriba hacia abajo, en dirección de la plomada."],
+      ["DIAGONAL","Línea que cruza una superficie en sentido oblicuo."],
+      ["CURVA","Línea que cambia de dirección de forma continua."],
+      ["PUNTO","Marca mínima que forma parte de un trazo o de una trama."],
+      ["FORMA","Figura delimitada por un contorno y reconocible en la obra."],
+      ["PICADO","Vista de una figura desde arriba, observada desde lo alto."],
+      ["ESTRUCTURA","Organización interna de las formas que sostiene un dibujo."],
+      ["PRESIÓN","Fuerza que se aplica sobre el lápiz para obtener distintos tonos."],
+      ["COMPÁS","Instrumento que sirve para trazar círculos y arcos."],
+      ["REGLA","Instrumento recto y graduado que sirve para trazar líneas."],
+      ["ESCUADRA","Instrumento con forma de triángulo que sirve para trazar ángulos."],
+      ["TRANSPORTADOR","Instrumento graduado que sirve para medir y trazar ángulos."],
+      ["PLANTILLA","Lámina recortada con formas que sirve de guía para dibujar."],
+      ["MAQUETA","Modelo a escala tridimensional de una obra o de un edificio."],
+      ["PLANO","Dibujo que representa un espacio visto desde arriba."],
+      ["MARGEN","Espacio libre que queda alrededor del dibujo sobre la hoja."],
+      ["ESBOZO","Primer trazo general que anticipa la composición de un dibujo."],
+      ["RETÍCULA","Malla de líneas que se superpone a una imagen para copiarla."],
+      ["LUMINOSO","Dicho de un dibujo: que transmite claridad y luz."],
+      ["CONTRASTE","Oposición marcada entre tonos claros y oscuros."],
+      ["TONO","Grado de claridad u oscuridad de un trazo o de una zona."],
+      ["ESTILO","Manera particular que tiene cada artista de dibujar."],
+      ["CROQUIS","Dibujo esquemático y rápido que resume una idea o un lugar."]
+    ]
+  },
+  escultura: {
+    label: "Escultura",
+    words: [
+      ["CINCEL","Herramienta de acero con filo que sirve para tallar piedra o madera."],
+      ["MAZO","Martillo grande que se usa para golpear el cincel durante la talla."],
+      ["GUBIA","Herramienta de corte curvo que se emplea para tallar madera."],
+      ["MÁRMOL","Roca compacta y brillante, muy apreciada para esculpir."],
+      ["BRONCE","Aleación de cobre y estaño que se utiliza para fundir esculturas."],
+      ["ARCILLA","Tierra blanda y plástica que se modela y luego se cuece."],
+      ["MODELAR","Dar forma a una masa blanda con las manos o con herramientas."],
+      ["TALLA","Obra o acción de cortar y dar forma a un material duro."],
+      ["FUNDICIÓN","Proceso de verter metal líquido en un molde para obtener una pieza."],
+      ["MOLDE","Hueco que da forma a una obra cuando se vierte material en su interior."],
+      ["ESTATUA","Escultura de bulto que representa una figura humana o animal."],
+      ["BUSTO","Escultura que representa la cabeza, los hombros y el pecho de una persona."],
+      ["RELIEVE","Obra en la que las figuras sobresalen de un fondo."],
+      ["BAJORRELIEVE","Relieve de poca profundidad, con figuras poco salientes."],
+      ["ALTORRELIEVE","Relieve con figuras muy salientes respecto del plano de fondo."],
+      ["MONUMENTO","Obra erigida para recordar un hecho, un lugar o a una persona."],
+      ["ESTELA","Lámina de piedra con inscripciones o relieves, usada como monumento."],
+      ["ESCULTOR","Artista que crea obras tridimensionales tallando o modelando."],
+      ["ESCULPIR","Tallar o modelar una obra dándole volumen."],
+      ["VOLUMEN","Espacio que ocupa un cuerpo en las tres dimensiones."],
+      ["EQUILIBRIO","Estabilidad de una obra que se sostiene sobre su base."],
+      ["PEDESTAL","Base sobre la que se apoya una escultura."],
+      ["PAPELMACHÉ","Pasta de papel y engrudo que se usa para modelar figuras livianas."],
+      ["YESO","Mineral blando que se usa para hacer moldes y modelos."],
+      ["ESTUCO","Revestimiento de yeso o cal con el que se modelan detalles."],
+      ["MADERA","Material procedente de los árboles que puede tallarse."],
+      ["NOGAL","Madera oscura y muy apreciada para tallar muebles y esculturas."],
+      ["CEDRO","Madera aromática y blanda que se usa en talla."],
+      ["PIEDRA","Material mineral sólido que sirve de base a muchas esculturas."],
+      ["GRANITO","Roca dura y resistente que se emplea en escultura y construcción."],
+      ["CALIZA","Roca sedimentaria blanda y fácil de tallar."],
+      ["TERRACOTA","Arcilla cocida de color rojizo, utilizada para figuras."],
+      ["CERÁMICA","Arte de dar forma a la arcilla y cocerla al fuego."],
+      ["HORNO","Lugar cerrado donde se cuece la cerámica a altas temperaturas."],
+      ["ENGOBE","Capa de arcilla líquida que cubre una pieza de cerámica."],
+      ["ESMALTE","Capa vítrea que cubre una pieza cerámica y le da brillo."],
+      ["VACIADO","Pieza que se obtiene al verter material en un molde."],
+      ["COLADA","Metal fundido que se vierte en el molde."],
+      ["SOLDADURA","Unión de piezas metálicas mediante la aplicación de calor."],
+      ["ALAMBRE","Hilo de metal que sirve para armar estructuras."],
+      ["ARMAZÓN","Estructura interna que sostiene una escultura."],
+      ["ALMA","Núcleo interior de una escultura, hecho de material resistente."],
+      ["PÁTINA","Capa de color que se forma en la superficie del bronce con el tiempo."],
+      ["BRUÑIDO","Pulido de una superficie hasta lograr un brillo intenso."],
+      ["PULIDO","Acción de alisar una superficie hasta dejarla lisa y brillante."],
+      ["LIJA","Papel con granos abrasivos que sirve para alisar superficies."],
+      ["GRADINA","Herramienta dentada que se usa para desbastar la piedra."],
+      ["TORNO","Máquina que hace girar una pieza para darle forma redonda."],
+      ["ROLLO","Cilindro de arcilla que se une para construir una pieza."],
+      ["PELLIZCO","Técnica de modelado que consiste en apretar la arcilla con los dedos."],
+      ["CORDÓN","Tira de arcilla que se enrolla para levantar las paredes de una pieza."],
+      ["PLASTILINA","Masa de colores que no se seca y se usa para modelar."],
+      ["SILICONA","Material flexible que se utiliza para sacar moldes."],
+      ["RESINA","Sustancia sólida o viscosa que se usa para fundir y endurecer piezas."],
+      ["FIBRA","Material de vidrio o de tela que se usa para reforzar esculturas."],
+      ["HIERRO","Metal duro y maleable que se forja y se suelda."],
+      ["ACERO","Aleación de hierro y carbono muy resistente."],
+      ["COBRE","Metal rojizo, maleable y buen conductor, usado en fundición."],
+      ["ESTAÑO","Metal blanco y blando que forma parte del bronce."],
+      ["ÓXIDO","Capa de color que se forma en el metal por la acción del aire."],
+      ["SOPORTE","Base que sostiene una escultura y la mantiene firme."],
+      ["CIMIENTO","Base o fundamento sobre el que se apoya una obra."],
+      ["HORMIGÓN","Mezcla de cemento, arena y piedra que se moldea al fraguar."],
+      ["LADRILLO","Pieza de arcilla cocida que se usa para construir."],
+      ["BASALTO","Roca oscura de origen volcánico, dura y difícil de tallar."],
+      ["ESCAYOLA","Yeso fino que se usa para hacer moldes y vaciados."],
+      ["CINCELADO","Decoración de una superficie hecha con cincel."],
+      ["REPUJADO","Técnica que levanta relieves desde el reverso de una lámina de metal."],
+      ["FORJA","Lugar donde se trabaja el metal calentándolo y golpeándolo."],
+      ["YUNQUE","Bloque de hierro sobre el que se golpea el metal al forjarlo."],
+      ["SIERRA","Herramienta de hoja dentada que sirve para cortar piedra o madera."],
+      ["ESPÁTULA","Herramienta plana que sirve para extender o alisar materiales blandos."],
+      ["RUGOSIDAD","Aspereza de una superficie tallada o modelada."],
+      ["PLOMADA","Pesa colgada de un hilo que indica la vertical."],
+      ["NIVEL","Instrumento que indica si una superficie está horizontal."],
+      ["BOCETO","Modelo pequeño que sirve para preparar una escultura."],
+      ["MOLDEADO","Dicho de una pieza: hecha dando forma con un molde."],
+      ["TORSO","Parte del cuerpo que comprende el pecho, el abdomen y la espalda."],
+      ["FIGURA","Representación de un ser humano o de un animal."],
+      ["CONJUNTO","Grupo de figuras que forman una sola obra."],
+      ["INSTALACIÓN","Obra tridimensional que se monta en un espacio determinado."],
+      ["ALEGORÍA","Figura que representa una idea abstracta por medio de una imagen."],
+      ["GÁRGOLA","Escultura de piedra con forma fantástica que desagua un tejado."],
+      ["CAPITEL","Parte superior de una columna, a menudo decorada con relieves."],
+      ["FRISO","Franja decorada con relieves que recorre un muro o un edificio."],
+      ["NICHO","Hueco en un muro donde se coloca una estatua."],
+      ["PEANA","Base pequeña sobre la que se apoya una figura."],
+      ["CABEZA","Parte superior del cuerpo, que en escultura suele ser un motivo principal."],
+      ["PÓRFIDO","Roca de color rojizo o verdoso, con cristales grandes, usada en talla."],
+      ["ARENA","Material granulado que se usa en fundición para hacer moldes."],
+      ["CERA","Materia blanda que se usa para modelar y para la fundición a la cera perdida."],
+      ["ESCORIA","Residuo que queda tras fundir un metal."],
+      ["PULIR","Frotar una superficie hasta darle brillo y suavidad."],
+      ["TALLAR","Cortar y dar forma a un material duro con herramientas."],
+      ["ESCULTURA","Arte de crear obras tridimensionales con diversos materiales."],
+      ["ESTRUCTURA","Organización de las partes que sostienen una obra."],
+      ["PLATERO","Artesano que trabaja los metales preciosos dándoles forma."],
+      ["VOLUMETRÍA","Estudio de los volúmenes que componen una escultura."],
+      ["RÉPLICA","Copia de una escultura hecha con el mismo modelo."],
+      ["ORIGINAL","Pieza única creada por el artista, sin copias."],
+      ["DIMENSIÓN","Medida de la obra en alto, ancho o profundidad."],
+      ["ESTABILIDAD","Capacidad de una escultura para mantenerse firme sin caer."],
+      ["SUPERFICIE","Capa exterior de una obra que se percibe a simple vista."],
+      ["CARÁCTER","Rasgo expresivo que distingue a una escultura."],
+      ["FORMA","Conjunto de líneas y volúmenes que definen una figura."],
+      ["ESPACIO","Lugar que ocupan las figuras y el vacío que las rodea."],
+      ["BRILLO","Reflejo de la luz sobre una superficie pulida."]
+    ]
+  },
+  grabado: {
+    label: "Grabado Artístico",
+    words: [
+      ["PRENSA","Máquina que aprieta la plancha y el papel para imprimir el grabado."],
+      ["ESTAMPA","Imagen impresa a partir de una matriz grabada."],
+      ["AGUAFUERTE","Técnica de grabado en metal en la que un ácido muerde las líneas trazadas."],
+      ["XILOGRAFÍA","Técnica de grabado en madera en la que se tallan las zonas que no imprimen."],
+      ["LINÓLEO","Material blando que se talla para realizar grabados en relieve."],
+      ["BURIL","Herramienta de acero con punta que sirve para grabar líneas en metal."],
+      ["PUNTASECA","Técnica de grabado directo en el que una punta de acero raya la plancha."],
+      ["AGUATINTA","Técnica de grabado que produce tonos mediante resina y ácido."],
+      ["LITOGRAFÍA","Técnica de impresión sobre piedra que se basa en la repulsión del agua y la grasa."],
+      ["SERIGRAFÍA","Técnica de impresión que pasa la tinta a través de una malla."],
+      ["MATRIZ","Superficie grabada que se usa para obtener copias impresas."],
+      ["PLANCHA","Lámina de metal u otro material donde se graba la imagen."],
+      ["TINTA","Pasta de pigmento que se aplica sobre la matriz para imprimir."],
+      ["ENTINTAR","Cubrir la matriz con tinta antes de imprimirla."],
+      ["RODILLO","Cilindro que se pasa sobre la tinta para extenderla."],
+      ["PAPEL","Soporte de fibra sobre el que se imprime la estampa."],
+      ["TIRAJE","Número de copias que se imprimen de una misma matriz."],
+      ["EDICIÓN","Conjunto de estampas impresas de una misma matriz, numeradas y firmadas."],
+      ["PRUEBA","Copia impresa para revisar el resultado antes de la edición final."],
+      ["CALCOGRAFÍA","Técnica de copia de un dibujo mediante calco sobre una matriz."],
+      ["MORDIDA","Acción del ácido sobre el metal que deja las líneas marcadas."],
+      ["BARNIZ","Capa protectora que se aplica sobre la matriz para proteger las zonas sin grabar."],
+      ["CERA","Material que se aplica sobre la plancha para proteger zonas o crear texturas."],
+      ["RASQUETA","Herramienta de borde afilado para raspar y limpiar la matriz."],
+      ["GOFRADO","Impresión en relieve sin tinta, que marca el papel con una matriz."],
+      ["MEZZOTINTA","Técnica de grabado que produce tonos mediante rebajes sobre una superficie rugosa."],
+      ["BRUÑIDOR","Herramienta que pule las zonas claras de una matriz."],
+      ["GRABAR","Trazar o marcar una imagen sobre una superficie dura."],
+      ["INCISIÓN","Corte o marca hecha sobre una superficie con una punta."],
+      ["HUECOGRABADO","Técnica en la que la tinta se aloja en surcos grabados en la plancha."],
+      ["OFFSET","Técnica de impresión que transfiere la tinta desde un cilindro de caucho."],
+      ["MONOTIPO","Estampa única que se obtiene pintando sobre una plancha lisa."],
+      ["COLAGRAFÍA","Técnica que construye la matriz pegando materiales sobre una base."],
+      ["ESTAMPADO","Acción de imprimir una imagen sobre el papel con presión."],
+      ["FOTOGRABADO","Técnica que reproduce una fotografía sobre una plancha."],
+      ["GRABADO","Arte de reproducir imágenes mediante matrices impresas."],
+      ["GRABADOR","Artista que crea estampas a partir de matrices grabadas."],
+      ["TRAMADO","Trazado de líneas entrecruzadas que producen un tono en la estampa."],
+      ["CONTRAPRUEBA","Impresión que se obtiene al estampar una estampa recién hecha."],
+      ["NEGATIVO","Imagen en la que las zonas claras y oscuras aparecen invertidas."],
+      ["POSITIVO","Imagen en la que las zonas claras y oscuras aparecen en su orden natural."],
+      ["IMPRESIÓN","Proceso de transferir una imagen desde una matriz al papel."],
+      ["REGISTRO","Alineación exacta del papel con la matriz al imprimir."],
+      ["MARCO","Borde que enmarca la estampa dentro de la hoja."],
+      ["BOCETO","Dibujo preparatorio que sirve de guía para la matriz."],
+      ["DIBUJO","Trazo o representación gráfica sobre una superficie."],
+      ["VIDRIO","Material transparente que puede servir como base para grabar."],
+      ["ZINC","Metal blanco y maleable, usado en grabados a punta seca y en aguafuerte."],
+      ["COBRE","Metal rojizo, muy usado para planchas de grabado por su maleabilidad."],
+      ["ACERO","Metal duro que se usa para planchas de grabado de larga tirada."],
+      ["MADERA","Material vegetal que se talla para obtener matrices de relieve."],
+      ["GUBIA","Herramienta de corte en forma de media caña para tallar madera."],
+      ["CUCHILLA","Herramienta afilada que se usa para cortar líneas en la matriz."],
+      ["BISEL","Corte oblicuo en el borde de una herramienta o de una plancha."],
+      ["CORTE","Línea que se abre en la matriz al retirar material."],
+      ["SURCO","Hendidura que deja la herramienta sobre la matriz y que retiene la tinta."],
+      ["VETA","Línea natural de la madera que influye en el trazo de la talla."],
+      ["FONDO","Zona de la matriz que no se graba y queda en blanco."],
+      ["NEGRO","Color más oscuro, que resulta de la densidad máxima de tinta."],
+      ["TONO","Grado de claridad u oscuridad de una zona de la estampa."],
+      ["DEGRADÉ","Paso gradual de un tono oscuro a uno claro."],
+      ["MEDIOTONO","Tono intermedio entre el blanco y el negro."],
+      ["GRANO","Punto o partícula que produce textura en la superficie grabada."],
+      ["ÁCIDO","Sustancia que muerde el metal y forma los surcos."],
+      ["MORDENTE","Sustancia que corroe la plancha para formar las líneas."],
+      ["BAÑO","Recipiente con ácido o líquido donde se sumerge la plancha."],
+      ["SECADO","Proceso de dejar secar la estampa antes de manipularla."],
+      ["HUMEDECER","Mojar el papel antes de imprimirlo para que absorba la tinta."],
+      ["NUMERADO","Dicho de una estampa: identificada con un número de tirada."],
+      ["SERIE","Conjunto de estampas relacionadas que forman una misma obra."],
+      ["SELLO","Marca que identifica la estampa o al grabador."],
+      ["TIMBRE","Marca en relieve impresa sobre el papel."],
+      ["CARTEL","Impresión de gran tamaño que anuncia o difunde un mensaje."],
+      ["AFICHE","Cartel impreso que se pega en la vía pública."],
+      ["PLAQUETA","Pequeña lámina de metal que sirve como matriz."],
+      ["HUELLA","Marca que deja la matriz al imprimirse sobre el papel."],
+      ["IMPRONTA","Señal que queda en el papel al presionar la matriz."],
+      ["BORDE","Límite exterior de la plancha o de la estampa."],
+      ["RELIEVE","Técnica en la que solo se imprimen las partes elevadas de la matriz."],
+      ["TRAZO","Línea que se marca sobre la matriz con una herramienta."],
+      ["LÍNEA","Marca continua que une dos puntos en la estampa."],
+      ["PUNTO","Marca pequeña que forma parte de una trama o de un tono."],
+      ["TRAMA","Entrecruzamiento de líneas que produce un tono en la imagen."],
+      ["HACHURA","Línea paralela que produce sombra en la estampa."],
+      ["CONTRASTE","Oposición entre zonas claras y oscuras de la imagen."],
+      ["LUZ","Zona de la estampa que queda sin tinta y representa la claridad."],
+      ["SOMBRA","Zona de la estampa con mayor cantidad de tinta, que representa la oscuridad."],
+      ["CLARO","Dicho de un tono: de intensidad baja, cercano al blanco."],
+      ["OSCURO","Dicho de un tono: de intensidad alta, cercano al negro."],
+      ["GRAFISMO","Conjunto de marcas gráficas propias de cada grabador."],
+      ["MONOCROMO","Estampa realizada en un solo color."],
+      ["POLICROMÍA","Estampa realizada con varios colores."]
+    ]
+  },
+  pintura: {
+    label: "Pintura",
+    words: [
+      ["ÓLEO","Pintura cuyo pigmento se mezcla con aceite secante, de secado lento."],
+      ["ACUARELA","Pintura de pigmentos diluidos en agua, de gran transparencia."],
+      ["TEMPLE","Pintura que mezcla pigmentos con un aglutinante como huevo o cola."],
+      ["FRESCO","Técnica de pintura mural sobre revoque húmedo de cal."],
+      ["PINCEL","Instrumento formado por un mango y cerdas o pelos que sirve para pintar."],
+      ["LIENZO","Tela tensada sobre un bastidor que sirve de soporte a la pintura."],
+      ["CABALLETE","Soporte de madera sobre el que se apoya el lienzo para pintar."],
+      ["PALETA","Superficie donde el pintor mezcla sus colores."],
+      ["ESPÁTULA","Herramienta plana que sirve para mezclar y extender la pintura."],
+      ["BARNIZ","Capa transparente que protege y da brillo a una pintura terminada."],
+      ["IMPRIMACIÓN","Capa previa que prepara el soporte para recibir la pintura."],
+      ["BASTIDOR","Armazón de madera sobre el que se tensa el lienzo."],
+      ["VELADURA","Capa fina y transparente de color que se aplica sobre otra ya seca."],
+      ["PIGMENTO","Sustancia en polvo que da color a una pintura."],
+      ["AGUADA","Capa de pintura muy diluida en agua que se aplica con pincel."],
+      ["GOUACHE","Pintura opaca a base de agua, similar a la acuarela pero más densa."],
+      ["ACRÍLICO","Pintura de secado rápido compuesta por una resina sintética."],
+      ["TEMPERA","Pintura al huevo o a la cola que se diluye en agua."],
+      ["ENCÁUSTICA","Técnica antigua que emplea cera caliente mezclada con pigmentos."],
+      ["MURAL","Pintura realizada directamente sobre un muro."],
+      ["COLLAGE","Composición hecha pegando diversos materiales sobre una superficie."],
+      ["ESPECTRO","Conjunto de colores que aparecen al descomponerse la luz blanca."],
+      ["ARMONÍA","Combinación agradable de colores que se perciben en equilibrio."],
+      ["COMPLEMENTARIO","Dicho de un color: el que, junto a otro, forma un contraste intenso."],
+      ["MATIZ","Variante de un color por la adición de otro color o de blanco."],
+      ["SATURACIÓN","Intensidad o pureza de un color."],
+      ["CROMÁTICO","Relativo al color y a su combinación en la obra."],
+      ["LUZ","Claridad que ilumina y da forma a los objetos pintados."],
+      ["SOMBRA","Zona oscura de un objeto que no recibe la luz directamente."],
+      ["CLAROSCURO","Técnica que contrasta luz y sombra para dar volumen."],
+      ["PENUMBRA","Zona de transición entre la luz y la sombra en una pintura."],
+      ["RETRATO","Pintura que representa a una persona, especialmente su rostro."],
+      ["PAISAJE","Pintura que representa la naturaleza o un lugar al aire libre."],
+      ["BODEGÓN","Pintura que representa objetos de la vida cotidiana, como frutas o vasijas."],
+      ["AUTORRETRATO","Retrato que el pintor hace de sí mismo."],
+      ["ESTUDIO","Obra preparatoria que se realiza para resolver un problema pictórico."],
+      ["LAVADO","Capa fina de color aplicada con mucha agua."],
+      ["ESGRAFIADO","Técnica que raspa una capa de pintura para dejar ver la de debajo."],
+      ["PÁTINA","Capa de color que se forma sobre una superficie con el tiempo."],
+      ["PASTA","Mezcla de pigmento y aglutinante que da cuerpo a la pintura."],
+      ["EMPASTE","Capa gruesa de pintura aplicada con la espátula o el pincel."],
+      ["GLACIS","Capa transparente de color que modifica el tono de lo que está debajo."],
+      ["LUSTRE","Brillo suave que presenta una superficie pintada."],
+      ["CAPA","Estrato de pintura que se aplica sobre otro."],
+      ["TRAZO","Línea que el pintor marca con el pincel o con otro instrumento."],
+      ["PINCELADA","Trazo que deja el pincel cargado de pintura sobre el soporte."],
+      ["TOQUE","Pequeña marca de color que se aplica para ajustar un detalle."],
+      ["DEGRADÉ","Paso gradual de un color a otro, o de un tono oscuro a uno claro."],
+      ["MEZCLA","Combinación de dos o más colores para obtener uno nuevo."],
+      ["COLOR","Sensación que produce la luz en la vista y que se percibe en la pintura."],
+      ["TONALIDAD","Gama de tonos predominante en una pintura."],
+      ["BRILLO","Reflejo de la luz en una superficie pintada."],
+      ["OPACIDAD","Propiedad de una pintura que no deja ver lo que tiene debajo."],
+      ["TRANSPARENCIA","Propiedad de una pintura que deja pasar la luz y ver lo de debajo."],
+      ["DILUYENTE","Líquido que sirve para rebajar la consistencia de la pintura."],
+      ["TREMENTINA","Líquido aromático que se usa para diluir óleos y limpiar pinceles."],
+      ["AGUARRÁS","Disolvente que se usa para diluir pinturas al óleo."],
+      ["ACEITE","Líquido graso que se mezcla con el pigmento en la pintura al óleo."],
+      ["GOTEO","Técnica que deja caer pintura sobre el soporte."],
+      ["SALPICADO","Técnica que proyecta gotas de pintura sobre la superficie."],
+      ["PUNTILLISMO","Técnica que forma imágenes con pequeños puntos de color puro."],
+      ["IMPRESIONISMO","Movimiento que capta la luz y el instante con pinceladas sueltas."],
+      ["EXPRESIONISMO","Movimiento que expresa emociones intensas mediante colores y formas deformadas."],
+      ["SURREALISMO","Movimiento que representa el mundo de los sueños y lo irracional."],
+      ["CUBISMO","Movimiento que descompone los objetos en planos geométricos."],
+      ["BARROCO","Estilo de arte del siglo XVII caracterizado por el movimiento y el dramatismo."],
+      ["RENACIMIENTO","Período artístico que recupera el ideal clásico de equilibrio y proporción."],
+      ["MANIERISMO","Estilo que exagera las proporciones y la elegancia de las figuras."],
+      ["ROMANTICISMO","Movimiento que da importancia a la emoción, la naturaleza y la imaginación."],
+      ["REALISMO","Corriente que representa la realidad tal como se ve, sin idealizarla."],
+      ["FAUVISMO","Movimiento que usa colores intensos y puros sin relación con la realidad."],
+      ["MURALISMO","Movimiento que pinta grandes murales con temas sociales e históricos."],
+      ["ABSTRACTO","Dicho de una pintura: que no representa objetos reconocibles."],
+      ["FIGURATIVO","Dicho de una pintura: que representa figuras reconocibles."],
+      ["TRÍPTICO","Obra pintada en tres partes unidas que pueden abrirse o cerrarse."],
+      ["PREDELA","Franja pintada en la parte inferior de un retablo."],
+      ["MANCHA","Zona de color aplicada sin contorno definido."],
+      ["CONTORNO","Línea que separa una forma de su fondo en la pintura."],
+      ["PERSPECTIVA","Técnica que da sensación de profundidad en la superficie plana."],
+      ["COMPOSICIÓN","Organización de los elementos dentro del cuadro."],
+      ["FONDO","Zona más alejada del espectador en una pintura."],
+      ["PLANO","Cada una de las zonas en que se divide el espacio de la pintura."],
+      ["HORIZONTE","Línea aparente donde se unen el cielo y la tierra en la pintura."],
+      ["TEXTURA","Aspecto de la superficie pintada que se percibe al tacto o a la vista."],
+      ["RITMO","Repetición ordenada de colores, formas o pinceladas."],
+      ["GAMA","Conjunto de colores que domina una obra."],
+      ["VIBRANTE","Dicho de un color: intenso, brillante y lleno de energía."],
+      ["PASTEL","Barra de pigmento seco con aglutinante que se usa para dibujar y pintar."],
+      ["TINTA","Líquido de color que se usa para dibujar o pintar."],
+      ["PINTOR","Artista que crea obras con pinturas sobre un soporte."],
+      ["PINTURA","Arte de representar imágenes con colores sobre una superficie."],
+      ["ARTISTA","Persona que crea obras de arte con talento y técnica."],
+      ["MUSEO","Lugar donde se exhiben y conservan obras de arte."],
+      ["GALERÍA","Espacio donde se exhiben y se venden obras de arte."],
+      ["OBRA","Creación artística terminada, como una pintura o una escultura."],
+      ["CUADRO","Pintura realizada sobre un soporte, generalmente enmarcada."]
+    ]
+  }
+};
+
+/* ========================================================
+   Sonido sintetizado (Web Audio, sin archivos externos)
+   ======================================================== */
+const Sound = {
+  ctx: null, muted: false,
+  init() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(freq, start, dur, type = 'sine', vol = 0.15, freqEnd = null) {
+    const t = this.ctx.currentTime + start;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  },
+  play(name) {
+    if (this.muted) return;
+    this.init();
+    if (!this.ctx) return;
+    if (name === 'ok') { this.tone(523.25, 0, 0.25); this.tone(783.99, 0.1, 0.25); }
+    if (name === 'splash') { this.tone(300, 0, 0.45, 'triangle', 0.12, 620); this.tone(180, 0.35, 0.2, 'sine', 0.12, 90); }
+    if (name === 'win') [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => this.tone(f, i * 0.11, 0.35, 'triangle', 0.14));
+    if (name === 'lose') [440, 392, 349.23, 293.66].forEach((f, i) => this.tone(f, i * 0.16, 0.35, 'sine', 0.12));
+  }
+};
+
+/* ========================================================
+   Estado y utilidades
+   ======================================================== */
+const MAX_FISH = 5;
+const ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L','Ñ'],
+  ['Z','X','C','V','B','N','M']
+];
+const FISH_COLORS = [
+  ['#e9c46a','#b08d57'], ['#e76f51','#9c4a33'], ['#2a9d8f','#1f4e5a'],
+  ['#e5989b','#9d5b5f'], ['#8ecae6','#3d6e86']
+];
+
+const state = {
+  category: 'todas',
+  entry: null,
+  guessed: new Set(),
+  fish: MAX_FISH,
+  streak: 0,
+  over: false,
+  used: new Set()
+};
+
+const $ = id => document.getElementById(id);
+
+// Quita tildes y devuelve la letra base; conserva la Ñ
+function baseLetter(ch) {
+  if (ch === 'ñ' || ch === 'Ñ') return 'Ñ';
+  const u = ch.toUpperCase();
+  const plain = u.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return /^[A-Z]$/.test(plain) ? plain : null;
+}
+
+function pickEntry(catKey) {
+  const pool = [];
+  const keys = catKey === 'todas' ? Object.keys(CATEGORIES) : [catKey];
+  keys.forEach(k => {
+    CATEGORIES[k].words.forEach(([word, def]) => pool.push({ word, def, label: CATEGORIES[k].label }));
+  });
+  let available = pool.filter(e => !state.used.has(e.word));
+  if (!available.length) { state.used.clear(); available = pool; }
+  const chosen = available[Math.floor(Math.random() * available.length)];
+  state.used.add(chosen.word);
+  return chosen;
+}
+
+/* ========================================================
+   Dibujo
+   ======================================================== */
+const fishSVG = (color, fin) => `
+  <svg viewBox="0 0 34 22" aria-hidden="true">
+    <path d="M28 11C28 11 22 3 13 3C7 3 3 7 3 11C3 15 7 19 13 19C22 19 28 11 28 11Z" fill="${color}" stroke="${fin}" stroke-width="1.2"/>
+    <path d="M27 11L33 5V17L27 11Z" fill="${fin}"/>
+    <circle cx="9" cy="10" r="1.6" fill="#2a2622"/>
+  </svg>`;
+
+function renderFish() {
+  const row = $('fish-row');
+  row.innerHTML = '';
+  for (let i = 0; i < MAX_FISH; i++) {
+    const d = document.createElement('div');
+    d.className = 'fish' + (i >= state.fish ? ' gone' : '');
+    d.innerHTML = fishSVG(...FISH_COLORS[i]);
+    row.appendChild(d);
+  }
+  $('count').textContent = `${state.fish}/${MAX_FISH}`;
+}
+
+function renderWord() {
+  const box = $('word');
+  box.innerHTML = '';
+  [...state.entry.word].forEach(ch => {
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    const L = baseLetter(ch);
+    if (state.guessed.has(L)) slot.classList.add('open');
+    const s = document.createElement('span');
+    s.textContent = ch;
+    slot.appendChild(s);
+    box.appendChild(slot);
+  });
+}
+
+function renderKeyboard() {
+  const kb = $('keyboard');
+  kb.innerHTML = '';
+  const letters = new Set([...state.entry.word].map(baseLetter));
+  ROWS.forEach(row => {
+    const r = document.createElement('div');
+    r.className = 'krow';
+    row.forEach(L => {
+      const b = document.createElement('button');
+      b.className = 'key';
+      b.textContent = L;
+      if (state.guessed.has(L)) {
+        b.disabled = true;
+        b.classList.add(letters.has(L) ? 'hit' : 'miss');
+      } else if (state.over) {
+        b.disabled = true;
+      }
+      b.addEventListener('click', () => guess(L));
+      r.appendChild(b);
+    });
+    kb.appendChild(r);
+  });
+}
+
+function setStatus(text, cls = '') {
+  const s = $('status');
+  s.textContent = text;
+  s.className = 'status ' + cls;
+}
+
+function renderAll() {
+  $('badge').textContent = state.entry.label;
+  $('hint-text').textContent = state.entry.def;
+  $('hint').classList.add('hidden');
+  renderFish();
+  renderWord();
+  renderKeyboard();
+  $('streak').textContent = state.streak;
+}
+
+/* ========================================================
+   Juego
+   ======================================================== */
+function newRound() {
+  state.entry = pickEntry(state.category);
+  state.guessed.clear();
+  state.fish = MAX_FISH;
+  state.over = false;
+  setStatus('Adivine la palabra antes de que escapen los peces.');
+  closeModal();
+  renderAll();
+}
+
+function escapeFish() {
+  const stage = $('stage');
+  const f = document.createElement('div');
+  f.className = 'escapee';
+  f.innerHTML = fishSVG(...FISH_COLORS[state.fish % MAX_FISH]);
+  stage.appendChild(f);
+  f.addEventListener('animationend', () => f.remove());
+
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  stage.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+
+  stage.classList.remove('shake');
+  void stage.offsetWidth;
+  stage.classList.add('shake');
+}
+
+function guess(letter) {
+  if (state.over || state.guessed.has(letter)) return;
+  state.guessed.add(letter);
+
+  const letters = new Set([...state.entry.word].map(baseLetter));
+  if (letters.has(letter)) {
+    Sound.play('ok');
+    setStatus(`¡Muy bien! La letra "${letter}" está en la palabra.`, 'ok');
+    renderWord();
+    renderKeyboard();
+    if ([...letters].every(L => state.guessed.has(L))) win();
+  } else {
+    state.fish -= 1;
+    Sound.play('splash');
+    escapeFish();
+    renderFish();
+    renderKeyboard();
+    if (state.fish > 0) {
+      setStatus(`La "${letter}" no está. Escapó un pez (quedan ${state.fish}).`, 'bad');
+    } else {
+      lose();
+    }
+  }
+}
+
+function win() {
+  state.over = true;
+  state.streak += 1;
+  Sound.play('win');
+  renderKeyboard();
+  $('streak').textContent = state.streak;
+  setTimeout(() => showModal(true), 600);
+}
+
+function lose() {
+  state.over = true;
+  state.streak = 0;
+  Sound.play('lose');
+  renderKeyboard();
+  $('streak').textContent = state.streak;
+  setStatus('¡Los peces se escaparon al río!', 'bad');
+  setTimeout(() => showModal(false), 900);
+}
+
+function showModal(won) {
+  $('m-eyebrow').textContent = won ? 'Muy bien' : 'Se escaparon los peces';
+  $('m-title').textContent = won ? '¡Palabra adivinada!' : 'Mejor suerte la próxima';
+  $('m-word').textContent = state.entry.word;
+  $('m-def').textContent = state.entry.def;
+  $('modal').classList.add('open');
+}
+
+function closeModal() {
+  $('modal').classList.remove('open');
+}
+
+/* ========================================================
+   Eventos
+   ======================================================== */
+$('category').addEventListener('change', e => {
+  state.category = e.target.value;
+  newRound();
+});
+$('hint-btn').addEventListener('click', () => {
+  $('hint').classList.toggle('hidden');
+});
+$('skip-btn').addEventListener('click', newRound);
+$('m-btn').addEventListener('click', newRound);
+$('audio').addEventListener('click', () => {
+  Sound.init();
+  Sound.muted = !Sound.muted;
+  $('audio').style.opacity = Sound.muted ? '0.5' : '1';
+});
+
+window.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if ($('modal').classList.contains('open')) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); newRound(); }
+    return;
+  }
+  const L = e.key.length === 1 ? baseLetter(e.key) : null;
+  if (L) guess(L);
+});
+
+newRound();
+</script>
+</body>
+</html>
